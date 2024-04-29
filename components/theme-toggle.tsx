@@ -27,7 +27,6 @@ export const ThemeToggle = () => {
         <Sun className="h-[1.2rem] w-[1.2rem] transition-all" />
         <span className="sr-only">Switch to dark theme</span>
       </Button>
-
       <Button
         onClick={() => {
           setTheme("light");
