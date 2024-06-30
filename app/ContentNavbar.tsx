@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { BlogBreadcrumb } from "./blog/(blogs)/Breadcrumb";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export const ContentNavbar = () => {
   const [_, ...path] = usePathname().split("/");
@@ -25,6 +26,7 @@ export const ContentNavbar = () => {
         </Link>
         <BlogBreadcrumb />
       </div>
+      <ThemeToggle className="ml-auto h-fit w-fit py-2 px-3" />
     </div>
   );
 };

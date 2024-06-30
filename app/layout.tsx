@@ -25,12 +25,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <nav className="flex py-2 px-4 ">
+          {/* <nav className="flex py-2 px-4 ">
             <div className="w-4/5"></div>
             <div className="w-1/5 flex justify-end gap-x-3">
               <ThemeToggle />
             </div>
-          </nav>
+          </nav> */}
 
           <main className="flex min-h-screen flex-col gap-y-4 items-center justify-start p-6 sm:p-8 ">
             <ContentNavbar />
