@@ -13,6 +13,7 @@ export const ThemeToggle = () => {
   return (
     <>
       <Button
+        variant={"ghost"}
         onClick={() => {
           setTheme("dark");
         }}
@@ -22,6 +23,7 @@ export const ThemeToggle = () => {
         <span className="sr-only">Switch to dark theme</span>
       </Button>
       <Button
+        variant={"ghost"}
         onClick={() => {
           setTheme("light");
         }}
