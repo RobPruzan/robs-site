@@ -57,3 +57,11 @@
     @apply bg-background text-foreground;
   }
 }
+.language-tsx {
+  padding: 15px !important;
+}
+
+.w-tc-editor-preview {
+  /* background-color: wheat !important; */
+  padding: 0px !important;
+}

@@ -1,0 +1,207 @@
+import { InfiniteCanvasMouseZooming } from "./InfiniteCanvasMouseZooming";
+import { InfiniteCanvas } from "./InfiniteCanvas";
+import { InfiniteCanvasMouseZoomingRefined } from "./InfiniteCanvasMouseZoomingRefined";
+import { WithCodeTab, FileCodeEditor } from "../../../../lib/WithCodeTab";
+import { SimpleCanvas } from "./SimpleCanvas";
+import { SimpleCanvasPan } from "./SimpleCanvasPan";
+import { SimpleCanvasMultiplayer } from "./SimpleCanvasMultiplayer";
+import { SimpleCanvasMultiplayerDerived } from "./SimpleCanvasMultiplayerDerived";
+import { SimpleCanvasDerived } from "./SimpleCanvasDerived";
+import { SimpleCanvasZoom } from "./SimpleCanvasZoom";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import Link from "next/link";
+
+6/30/24
+
+## Motivation
+
+I'm now building my third app which needs an infinite canvas- pannable and zoomable. I like implementing it myself over using an abstraction
+to avoid all of the bloat that comes with graphics libaries. You can get pretty far with not a lot of canvas code.
+
+Id like to document how my implementation of an infinite canvas has changed, how I'd currently implement an infinite canvas,
+and how to integrate multiplayer into an infinite canvas.
+
+## Pre-reqs/ dependencies
+
+- React
+- Typescript
+
+As long as you understand the basic fundamentals of React & Typescript, the code snippets should make sense to you.
+
+## Introduction
+
+The first time I built an infinite canvas was for my algorithm visualization website <Link href="https://algoviz.app">AlgoViz</Link>.
+This was also the first time I built anything canvas related, so I think it's useful to point out naive solutions that someone
+might think of, and how they compare to a more refined solution.
+
+### Rendering geometry
+
+The thing all infinite canvas applications will have in common is the need to render some geometry on the canvas.
+
+<WithCodeTab filePath="./app/blog/(articles)/infinite-canvas/SimpleCanvas.tsx">
+  <SimpleCanvas />
+</WithCodeTab>
+
+This is a simple task since the browser gives us all the API's we need to draw different geometry to the canvas.
+Our responsibility is how we will handle its movement.
+
+### Panning
+
+The first time I implemented panning all I wanted was the rendered geometry on the screen to be affected by my
+trackpad movement. So the most straight forward solution (to me) was to update the location of my geometry in state.
+
+So all we have to do is listen for trackpad events (`"wheel"`), and update our geometry state by movement amount for the current event:
+`event.deltaX, event.deltaY`.
+
+<WithCodeTab filePath="./app/blog/(articles)/infinite-canvas/SimpleCanvasPan.tsx">
+  <SimpleCanvasPan />
+</WithCodeTab>
+
+This works pretty well if all we want is the allusion of panning, and we don't mind our geometry not sitting on a fixed coordinate system.
+
+But, this implementation quickly falls apart if we start thinking about multiplayer. By multiplayer, I mean the canvas geometry state
+is shared between users.
+
+<WithCodeTab filePath="./app/blog/(articles)/infinite-canvas/SimpleCanvasMultiplayer.tsx">
+  <SimpleCanvasMultiplayer />
+</WithCodeTab>
+
+> **Note** Here I simulated multiple players and shared state with a react component that holds shared state between the
+> multiple canvas instances, but in reality you would be using something like a web-socket connection to dispatch
+> state updates to other players.
+
+What the above components show you is that panning one canvas instance also pans the other. Currently our local coordinate system
+is tightly coupled to the geometry we want to render.
+
+Instead of modifying the actual coordinates of the geometry, we can just maintain state that holds how much we are translated in the x and y direction,
+then we can apply that translation when we end up drawing to the canvas
+
+<WithCodeTab filePath="./app/blog/(articles)/infinite-canvas/SimpleCanvasDerived.tsx">
+  <SimpleCanvasMultiplayerDerived />
+</WithCodeTab>
+
+Now panning one canvas will succesfully not affect the other user's geometry state.
+
+### Zooming
+
+Zooming is a similar concept to panning, but instead of adding to our coordinates by some amount, we will scale.
+
+We can do this in 2 ways:
+
+- Update the geomotery items coordinates everytime the user zooms
+- Maintain zoom state, where we apply the transformation to the geometry when rendering
+
+Because we already encountered the pitfalls of updating the actual geomotery coordinates, we will jump
+straight to maintaining a seperate piece of state that represents how much the user is zoomed.
+
+```ts
+const [zoom, setZoom] = useState(1);
+```
+
+To do this, we will re-use the wheel event we setup on the canvas. The way the browser exposes zooming
+is a wheel event, where the `event.ctrlKey == true`. We can then read the `event.deltaY` property to know how much
+the user is zooming in either direction. We can continously update our zoom value everytime we recieve this event.
+Then once we have our tracked zoom value, we will update the `(x, y, radius)` of the circle before drawing it to the canvas.
+
+<WithCodeTab filePath="./app/blog/(articles)/infinite-canvas/SimpleCanvasZoom.tsx">
+  <SimpleCanvasZoom />
+</WithCodeTab>
+
+This works, but we have some annoying behavior, it always zooms to the origin. This makes sense when you think about it-
+0 \* \<anything> is 0, and that will never change. So when we zoom, everything but the origin will be change, and vice versa,
+everything not at the origin will be given a number that is further away from (0,0) in terms of magnitude. Giving the
+appearence that the zoom is fixed around the origin, and everything else is moving away.
+
+The desirable behavior here would be to lock the zoom target around the mouse. So that when a user zooms, the items
+at the users mouse position will grow in size, rather than move away. Otherwise the user would have to zoom, then translate
+back to the place they to go, zoom, translate, zoom.
+
+Instead of the user performing this uncomfortable set of actions, we could do this for them. Everytime the user zooms,
+dont allow the mouse to gravitate towards the origin (0,0) by translating the screen the **opposite** amount it wants to move.
+
+To do this, we would need to know where our mouse is in our coordinate system (which I will refer to as the world
+coordinates), while the browser can only give us information about where our mouse is relative to the screen (which I will refer to as screen
+coordinates). We need the world coordinates because our mouse will not be moving relative to the screen.
+
+So lets make a function that converts screen coordinates to world coordinates
+
+```ts
+const toWorld = ({
+  translation,
+  zoom,
+  screenCoordinate,
+}: {
+  translation: { x: number; y: number };
+  zoom: number;
+  screenCoordinate: { x: number; y: number };
+}) => {
+  return {
+    // shift the coordinate by the translation amount, then scale the coordiante by the zoom factor
+    x: (screenCoordinate.x - translation.x) * zoom,
+    y: (screenCoordinate.y - translation.y) * zoom,
+  };
+};
+```
+
+Now using this we can calculate how much our mouse has moved, in world coordinates, inbetween zooms. Then we force a translation so that any
+`(x,y)` movement the zoom caused will be counter-acted by this translation.
+
+```ts
+const mousePosition = coordinatesFromMouseEvent(event);
+const priorMouseWorldPosition = toWorld({
+  translation,
+  zoom,
+  screenCoordinate: mousePosition,
+});
+const newZoom = zoom * Math.pow(event.deltaY, 0.99);
+const newMouseWorldPosition = toWorld({
+  translation,
+  zoom: newZoom,
+  screenCoordinate: mousePosition,
+});
+
+setTranslation((prev) => ({
+  x: prev.x + (newMouseWorldPosition.x - priorMouseWorldPosition.x),
+  y: prev.y + (newMouseWorldPosition.y - priorMouseWorldPosition.y),
+}));
+```
+
+<InfiniteCanvasMouseZooming />
+
+Now that we have a working implementation, lets clean up some things.
+
+The canvas may be a little blury depending on your device resolution, we can make the canvas
+use more pixels when rendering objects on devices with higher device piel ratios (dpi) with:
+
+```ts
+const ctx = canvas.getContext("2d");
+const dpr = window.devicePixelRatio;
+const rect = canvas.getBoundingClientRect();
+
+canvas.width = rect.width * dpr;
+canvas.height = rect.height * dpr;
+
+canvas.style.width = `${rect.width}px`;
+canvas.style.height = `${rect.height}px`;
+
+ctx.scale(dpr, dpr);
+```
+
+And we don't need to manually translate and zoom the coordinates of every object we render, the canvas can
+handle this automatically:
+
+```ts
+ctx.scale(zoom, zoom);
+ctx.translate(-x, -y);
+```
+
+We can finally make this implementation reusable by extracting the logic to a hook
+
+<WithCodeTab filePath="./app/blog/(articles)/infinite-canvas/InfiniteCanvas.tsx">
+  <InfiniteCanvas />
+</WithCodeTab>

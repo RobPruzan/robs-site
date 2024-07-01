@@ -70,7 +70,7 @@ export default function Home() {
           <TimelineItem
             date="June 2024 – Aug 2024"
             title="Software Engineering Intern at Walmart"
-            description="Worked on core iOS app development for Walmart Pay on the Walmart app"
+            description="Core iOS app development for Walmart Pay on the Walmart app"
           />
           <TimelineItem
             date="Feb 2024 – May 2024"

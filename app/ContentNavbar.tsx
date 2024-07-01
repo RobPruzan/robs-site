@@ -2,7 +2,7 @@
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-import { BlogBreadcrumb } from "./blog/(blogs)/Breadcrumb";
+import { BlogBreadcrumb } from "./blog/(articles)/Breadcrumb";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export const ContentNavbar = () => {

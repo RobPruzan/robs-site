@@ -22,7 +22,6 @@ export default function RootLayout({
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
-          enableSystem
           disableTransitionOnChange
         >
           {/* <nav className="flex py-2 px-4 ">
