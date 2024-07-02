@@ -381,6 +381,7 @@ very simple manner
 
 <WithMultiCodeTab
   noCheck
+  replace={content => content.replace("wss://website-demo-production-8408.up.railway.app", "http://localhost:8080")}
   filePaths={[
     {
       name: "InfiniteCanvas.tsx",
@@ -422,6 +423,12 @@ capture group of the function did not change.
 
 <WithMultiCodeTab
   noCheck
+  replace={(content) =>
+    content.replace(
+      "wss://website-demo-production-8408.up.railway.app",
+      "http://localhost:8080"
+    )
+  }
   filePaths={[
     {
       name: "InfiniteCanvas.tsx",

@@ -12,7 +12,7 @@ export type Geometry = {
 export const InfiniteCanvasReactCompiler = () => {
   const [geometry, setGeometry] = useState<Array<Geometry>>([]);
   const { socket, status } = useWebSocket<Geometry>({
-    url: "http://localhost:8080",
+    url: "wss://website-demo-production-8408.up.railway.app",
     onMessage: ({ parsedJson }) => setGeometry((prev) => [...prev, parsedJson]),
   });
   const { camera, canvasRef } = Canvas.useInfiniteCanvas({

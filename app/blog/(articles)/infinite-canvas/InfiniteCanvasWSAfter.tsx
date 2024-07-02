@@ -35,7 +35,9 @@ export const InfiniteCanvasWSAfter = () => {
   const [socket, setSocket] = useState<null | WebSocket>(null);
 
   useEffect(() => {
-    const newSocket = new WebSocket("http://localhost:8080");
+    const newSocket = new WebSocket(
+      "wss://website-demo-production-8408.up.railway.app"
+    );
     const handleOpen = () => {
       setSocket(newSocket);
     };

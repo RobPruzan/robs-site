@@ -18,7 +18,7 @@ export const InfiniteCanvasFinal = () => {
     []
   );
   const { socket, status } = useWebSocket<Geometry>({
-    url: "http://localhost:8080",
+    url: "wss://website-demo-production-8408.up.railway.app",
     onMessage: handleMessage,
   });
   const draw = useCallback<Canvas.Draw>(
