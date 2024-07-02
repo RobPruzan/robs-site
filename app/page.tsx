@@ -45,7 +45,7 @@ export default function Home() {
       </span>
       <span className="text-xl w-full text-start">Projects</span>
       <div className="flex w-full justify-start">
-        <div className="grid grid-cols-2 grid-rows-2 gap-4">
+        <div className="grid grid-cols-1 grid-rows-1 sm:grid-cols-2 sm:grid-rows-2 gap-4">
           <ProjectCard
             description="A realtime question board, supporting P2P audio streaming, live transcription and multiplayer infinite whiteboards"
             href="https://fireside.ninja"
