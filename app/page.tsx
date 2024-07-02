@@ -1,4 +1,4 @@
-import { Github, Linkedin, School } from "lucide-react";
+import { Calendar, Github, Linkedin, School } from "lucide-react";
 import Link from "next/link";
 
 export default function Home() {
@@ -28,14 +28,19 @@ export default function Home() {
             <span> https://linkedin.com/in/robert-pruzan</span>
           </Link>{" "}
         </div>
+        <div className="flex items-end text-sm gap-x-3">
+          <Calendar className="text-blue-600" />
+          <span>Age: 20</span>
+        </div>
       </div>
 
       <span>
-        Hello! I'm Robby, a computer science student that likes to build cool
-        stuff. This website is for documenting my experiences. Check out the
+        Hello! I'm Robby, a computer science student. This website is for
+        documenting my experiences while building different projects. Check out
+        the
         <Link className="text-blue-500 underline mx-2" href={"/blog"}>
           blog
-        </Link>{" "}
+        </Link>
         to see what I've written so far!
       </span>
       <span className="text-xl w-full text-start">Projects</span>
