@@ -1,6 +1,5 @@
 "use client";
 import { useCallback, useState } from "react";
-// import { useInfiniteCanvas } from "./canvas-lib";
 import * as Canvas from "./canvas-lib";
 export type Geometry = {
   kind: "circle";

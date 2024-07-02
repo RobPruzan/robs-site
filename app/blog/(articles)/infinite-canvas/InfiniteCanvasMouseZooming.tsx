@@ -1,42 +1,30 @@
 "use client";
-import {
-  MutableRefObject,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { Geometry } from "./SimpleCanvasMultiplayer";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
+type Geometry = { kind: "circle"; x: number; y: number };
 
-export type Coordinate = {
+type Coordinate = {
   x: number;
   y: number;
 };
-export type Camera = {
+type Camera = {
   zoom: number;
 } & Coordinate;
 
-export const toWorld = (
-  screenCoord: Coordinate,
-  camera: Camera
-): Coordinate => {
+const toWorld = (screenCoord: Coordinate, camera: Camera): Coordinate => {
   return {
     x: camera.x + screenCoord.x / camera.zoom,
     y: camera.y + screenCoord.y / camera.zoom,
   };
 };
 
-export const toScreen = (
-  worldCoord: Coordinate,
-  camera: Camera
-): Coordinate => {
+const toScreen = (worldCoord: Coordinate, camera: Camera): Coordinate => {
   return {
     x: (worldCoord.x - camera.x) * camera.zoom,
     y: (worldCoord.y - camera.y) * camera.zoom,
   };
 };
 
-export const coordinatesFromMouseEvent = ({
+const coordinatesFromMouseEvent = ({
   event,
   camera,
   canvasRef,

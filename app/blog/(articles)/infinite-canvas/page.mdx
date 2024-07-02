@@ -2,15 +2,23 @@ import { InfiniteCanvasMouseZooming } from "./InfiniteCanvasMouseZooming";
 import { InfiniteCanvas } from "./InfiniteCanvas";
 import { InfiniteCanvasWSBefore } from "./InfiniteCanvasWSBefore";
 import { InfiniteCanvasMouseZoomingRefined } from "./InfiniteCanvasMouseZoomingRefined";
-import { WithCodeTab, FileCodeEditor } from "../../../../lib/WithCodeTab";
+import {
+  WithCodeTab,
+  FileCodeEditor,
+  WithMultiCodeTab,
+} from "../../../../lib/WithCodeTab";
+import { PrismEditor } from "../../../../lib/PrismEditor";
+
+import { EstimatedReadTime } from "../../../../lib/EstimatedReadTime";
 import { SimpleCanvas } from "./SimpleCanvas";
 import { SimpleCanvasPan } from "./SimpleCanvasPan";
 import { SimpleCanvasMultiplayer } from "./SimpleCanvasMultiplayer";
 import { SimpleCanvasMultiplayerDerived } from "./SimpleCanvasMultiplayerDerived";
 import { SimpleCanvasDerived } from "./SimpleCanvasDerived";
 import { SimpleCanvasZoom } from "./SimpleCanvasZoom";
-
 import { InfiniteCanvasWSCoordinator } from "./InfiniteCanvasWSCoordinator";
+import { InfiniteCanvasFinalCoordinator } from "./InfiniteCanvasFinalCoordinator";
+import { InfiniteCanvasReactCompiler } from "./InfiniteCanvasReactCompiler";
 
 import {
   Accordion,
@@ -22,15 +30,18 @@ import Link from "next/link";
 
 6/30/24
 
+<EstimatedReadTime path="./app/blog/(articles)/infinite-canvas/page.mdx" />
 ## Motivation
 
-I'm now building my third app which needs an infinite canvas- pannable and zoomable. I like implementing it myself over using an abstraction
-to avoid all of the bloat that comes with graphics libaries. You can get pretty far with not a lot of canvas code.
+I'm now building my third app which needs an infinite canvas- pannable and zoomable.
+I like implementing it myself over using an abstraction to avoid all of the bloat
+that comes with graphics libaries. You can get pretty far with not a lot of canvas
+code.
 
 Id like to document:
 
 - How my implementation of an infinite canvas has changed
-- Jow I'd currently implement an infinite canvas,
+- How I'd currently implement an infinite canvas,
 - How to integrate multiplayer into an infinite canvas.
 
 ## Pre-reqs/ dependencies
@@ -50,7 +61,10 @@ might think of, and how they compare to a more refined solution.
 
 The thing all infinite canvas applications will have in common is the need to render some geometry on the canvas.
 
-<WithCodeTab filePath="./app/blog/(articles)/infinite-canvas/SimpleCanvas.tsx">
+<WithCodeTab
+  name="InfiniteCanvas.tsx"
+  filePath="./app/blog/(articles)/infinite-canvas/SimpleCanvas.tsx"
+>
   <SimpleCanvas />
 </WithCodeTab>
 
@@ -67,18 +81,34 @@ To implement this, all thats needed ontop of the prior example is to:
 1. Listen for trackpad events on the canvas (`"wheel"`)
 2. Update the geomotry state by how much movement was detected during the wheel event (`event.deltaX, event.deltaY`)
 
-<WithCodeTab filePath="./app/blog/(articles)/infinite-canvas/SimpleCanvasPan.tsx">
+<WithCodeTab
+  name="InfiniteCanvas.tsx"
+  filePath="./app/blog/(articles)/infinite-canvas/SimpleCanvasPan.tsx"
+>
   <SimpleCanvasPan />
 </WithCodeTab>
+> **Note!** All the demo components can be reset by hitting the undo icon in the
+top left
 
 This gets the job done if all we want is the allusion of panning.
 
 But, this implementation quickly falls apart if we start thinking about using the canvas implementation in a multiplayer setting.
 By multiplayer, I mean the canvas geometry state is shared between users.
 
-<WithCodeTab filePath="./app/blog/(articles)/infinite-canvas/SimpleCanvasMultiplayer.tsx">
+<WithMultiCodeTab
+  filePaths={[
+    {
+      name: "MultiplayerInfiniteCanvas.tsx",
+      path: "./app/blog/(articles)/infinite-canvas/SimpleCanvasMultiplayer.tsx",
+    },
+    {
+      name: "InfiniteCanvas.tsx",
+      path: "./app/blog/(articles)/infinite-canvas/SimpleCanvasPanPlayer.tsx",
+    },
+  ]}
+>
   <SimpleCanvasMultiplayer />
-</WithCodeTab>
+</WithMultiCodeTab>
 
 > **Note** Here I simulated multiple players and shared state with a react component that passes down state to
 > 2 canvas instances. In reality you would be using something like a web-socket connection to dispatch
@@ -90,7 +120,10 @@ is tightly coupled to the geometry we want to render.
 Instead of modifying the actual position of the geometry to implement panning, we can just maintain state that holds how far we are translated
 in the x and y direction. After we can apply that translation when we draw to the canvas.
 
-<WithCodeTab filePath="./app/blog/(articles)/infinite-canvas/SimpleCanvasDerived.tsx">
+<WithCodeTab
+  name="InfiniteCanvas.tsx"
+  filePath="./app/blog/(articles)/infinite-canvas/SimpleCanvasDerived.tsx"
+>
   <SimpleCanvasMultiplayerDerived />
 </WithCodeTab>
 
@@ -108,24 +141,23 @@ We can do this in 2 ways:
 Because we already encountered the pitfalls of updating the actual geomotery's coordinates, we will jump
 straight to maintaining a seperate piece of state that represents how much the user is zoomed.
 
-```ts
-const [zoom, setZoom] = useState(1);
-```
-
 To do this, we will re-use the wheel event we setup on the canvas- the browser exposes zooming through
 a wheel event, where the `event.ctrlKey == true`. We can then read the `event.deltaY` property to know how much
 the user is zooming in either direction. We can continously update our zoom value everytime we recieve this event.
 
 Once we have our tracked zoom value, we can apply the zoom on the `(x, y, radius)` of the circle before drawing it to the canvas:
 
-<WithCodeTab filePath="./app/blog/(articles)/infinite-canvas/SimpleCanvasZoom.tsx">
+<WithCodeTab
+  name="InfiniteCanvas.tsx"
+  filePath="./app/blog/(articles)/infinite-canvas/SimpleCanvasZoom.tsx"
+>
   <SimpleCanvasZoom />
 </WithCodeTab>
 
 This works, but we have some annoying behavior, it always zooms to the origin.
 
 This makes sense when you think about it-
-0 \* \<anything> is 0, and that will never change. So when we zoom, everything at the origin will not move from our perspective, while
+0 \* \<anything> is 0, and that will never change. So when we zoom, everything at the origin won't move from our perspective, while
 everything not at the origin will be scaled to a coordinate that is further away from `(0,0)`. Giving the
 appearence that the zoom is fixed around the origin, and everything else is moving away.
 
@@ -133,125 +165,274 @@ The desirable behavior here would be to lock screen around the mouse, not `(0,0)
 at the users mouse position will grow in size, rather than move away. Otherwise the user would have to zoom, then translate
 back to the place they to go, zoom, translate, zoom...
 
-Instead of the user performing this uncomfortable set of actions, we could do this for them. Everytime the user zooms,
+Instead of the user performing these uncomfortable set of actions, we could do this for them. Everytime the user zooms,
 dont allow the mouse to gravitate towards the origin (0,0) by translating the screen the **opposite** amount it wants to move.
 
 To do this, we would need to know where our mouse is in our coordinate system (which I will refer to as world
 coordinates), while the browser can only give us information about where our mouse is relative to the screen (which I will refer to as screen
-coordinates). We need the world coordinate because our mouse will not be moving relative to the screen.
+coordinates). We need the world coordinate because our mouse will not be moving relative to the screen when zooming.
 
 So lets make a function that converts screen coordinate's to world coordinates
 
-```ts
-const toWorld = ({
-  translation,
-  zoom,
-  screenCoordinate,
-}: {
-  translation: { x: number; y: number };
-  zoom: number;
-  screenCoordinate: { x: number; y: number };
-}) => {
-  return {
-    // shift the coordinate by the translation amount, then scale the coordiante by the zoom factor
-    x: (screenCoordinate.x - translation.x) * zoom,
-    y: (screenCoordinate.y - translation.y) * zoom,
-  };
-};
-```
+<FileCodeEditor filePath="./app/blog/(articles)/infinite-canvas/snippets/to-world.ts" />
 
 Now using this we can calculate how much our mouse has moved, in world coordinates, inbetween zooms. Then we
 update our translation state so that the `(x,y)` movement caused by the zoom would be counter-acted by this translation.
 
-```ts
-const mousePosition = coordinatesFromMouseEvent(event);
-const priorMouseWorldPosition = toWorld({
-  translation,
-  zoom,
-  screenCoordinate: mousePosition,
-});
-const newZoom = zoom * Math.pow(event.deltaY, 0.99);
-const newMouseWorldPosition = toWorld({
-  translation,
-  zoom: newZoom,
-  screenCoordinate: mousePosition,
-});
+<FileCodeEditor
+  filePath="./app/blog/(articles)/infinite-canvas/snippets/correct-zoom.ts"
+  noCheck
+/>
 
-setTranslation((prev) => ({
-  x: prev.x + (newMouseWorldPosition.x - priorMouseWorldPosition.x),
-  y: prev.y + (newMouseWorldPosition.y - priorMouseWorldPosition.y),
-}));
-```
+<WithCodeTab
+  name="InfiniteCanvas.tsx"
+  filePath="./app/blog/(articles)/infinite-canvas/InfiniteCanvasMouseZooming.tsx"
+>
+  <InfiniteCanvasMouseZooming />
+</WithCodeTab>
 
-<InfiniteCanvasMouseZooming />
-
-Now that we have a working implementation, so lets clean up some things.
+Now that we have a working implementation, lets clean up some things.
 
 The canvas may be a little blury depending on your device resolution, we can make the canvas
 use more pixels when rendering objects on devices with higher device pixel ratios (dpi) with:
 
-```ts
-const ctx = canvas.getContext("2d");
-const dpr = window.devicePixelRatio;
-const rect = canvas.getBoundingClientRect();
-
-canvas.width = rect.width * dpr;
-canvas.height = rect.height * dpr;
-
-canvas.style.width = `${rect.width}px`;
-canvas.style.height = `${rect.height}px`;
-
-ctx.scale(dpr, dpr);
-```
+<FileCodeEditor
+  filePath="./app/blog/(articles)/infinite-canvas/snippets/dpi.ts"
+  noCheck
+/>
 
 And we don't need to manually translate and zoom the coordinates of every object we draw, the canvas can
 handle this automatically:
 
-```ts
-ctx.scale(zoom, zoom);
-ctx.translate(-x, -y);
-```
+<FileCodeEditor
+  filePath="./app/blog/(articles)/infinite-canvas/snippets/auto-transform.ts"
+  noCheck
+/>
 
 We can also make this implementation reusable by extracting the logic to a hook
 
-<WithCodeTab filePath="./app/blog/(articles)/infinite-canvas/InfiniteCanvas.tsx">
+<WithMultiCodeTab
+  filePaths={[
+    {
+      name: "InfiniteCanvas.tsx",
+      path: "./app/blog/(articles)/infinite-canvas/InfiniteCanvas.tsx",
+    },
+    {
+      name: "canvas-lib.tsx",
+      path: "./app/blog/(articles)/infinite-canvas/canvas-lib.tsx",
+    },
+  ]}
+>
   <InfiniteCanvas />
-</WithCodeTab>
+</WithMultiCodeTab>
 
 ### Multiplayer
 
-To make our canvas multiplayer I will use a [bun](https://bun.sh/) with no dependencies.
+To make our canvas multiplayer I will use a [bun](https://bun.sh/) webserver with no dependencies.
 
-Lets first setup a simple websocket server for our future multiplayer canvas
+Lets first setup a simple websocket (WS) server for our future multiplayer canvas:
 
-```ts
-const server = Bun.serve({
-  fetch(req, server) {
-    server.upgrade(req);
-  },
-  websocket: {
-    open: (ws) => {
-      ws.subscribe("canvas");
+<WithCodeTab
+  name="server.ts"
+  filePath="./app/blog/(articles)/infinite-canvas/snippets/initial-bun-server.ts"
+  noCheck
+/>
+
+Bun will automatically send the 101 Upgrade response when we call `server.upgrade(req)`, and provides easy access
+of the TCP connection to send and recieve websocket frames through the `websocket` property on `Bun.serve`
+
+We can run the server with:
+
+`bun run --hot <filename>`
+
+Because bun can transpile typescript internally, we only need the single typescript file. But if you want autocomplete through typescript on the
+`Bun` global, first setup a bun project with:
+
+`bun init`
+
+This is enough to give your IDE the information about bun's types.
+
+Now, lets setup some interaction on our local canvas before we start recieving interactions from other players.
+We will start with drawing a circle `onClick` of the canvas.
+
+<WithMultiCodeTab
+  filePaths={[
+    {
+      name: "InfiniteCanvas.tsx",
+      path: "./app/blog/(articles)/infinite-canvas/InfiniteCanvasWSBefore.tsx",
     },
-    message: async (ws, message) => {
-      ws.publish("canvas", message);
+    {
+      name: "canvas-lib.tsx",
+      path: "./app/blog/(articles)/infinite-canvas/canvas-lib.tsx",
     },
-  },
-  port: 8080,
-});
+  ]}
 
-console.log(`Listening on ${server.hostname}:${server.port}`);
-```
+>
 
-Now we can run the server with:
-
-`bun run <filename>`
-
-Now, lets setup some interaction on our canvas before we start recieving interactions from other players.
-We will start with drawing a circle on click of the canvas.
-
-<WithCodeTab filePath="./app/blog/(articles)/infinite-canvas/InfiniteCanvasWSBefore.tsx">
   <InfiniteCanvasWSBefore />
-</WithCodeTab>
+</WithMultiCodeTab>
 
-<InfiniteCanvasWSCoordinator />
+Here we use our function we made previously: `coordinatesFromMouseEvent`. Where we take in the mouses's screen coordinates, that the browser provides
+in the click event, and translates + scale the coordinates based on the camera's current state. Having world coordinates will allow us to make it
+very easy to share state between multiple players.
+
+Now we are going to update our web-socket server to handle recieving and sending messages from connected clients.
+
+Our WS server is going to do little work. The main task will be maintaining the sockets within an array,
+so when users send messages to our WS server we can broadcast the message to everyone who is connected to our WS server:
+
+<WithCodeTab
+  resettable={false}
+  name="server.ts"
+  filePath="./app/blog/(articles)/infinite-canvas/snippets/bun-server-2.ts"
+  noCheck
+/>
+
+Next we need to make the connection on the client.
+
+The steps we will go to accomplish this is:
+
+1. Setup state in react to hold the socket object returned by `WebSocket`
+2. Setup event listeners for the socket to appropriately react to the sockets current state
+
+- It's useful to setup WS event listeners in their own useEffects, it can be bug prone
+  when complexity increases to have several event ws listener setups in a single useEffect.
+
+3. Cleanup anything we setup in the useEffect in the cleanup function
+
+- This is a very important step. When our component unmounts the websocket connection will not close automatically. And if
+  the depenencies in our event listener `useEffect`s change, we will adding **more** event listeners, without ever removing the previously
+  added listeners. This can be very problamatic because the functions set in the even listeners may no longer be correct- due to the
+  captured values being stale- potentially breaking our application. And even if they are still valid, it can very quickly lead to a
+  performance-impacting-memory-leak
+
+> **Note!** Here we assume the websocket server is available at `http://localhost:8080`
+
+<FileCodeEditor
+  filePath="./app/blog/(articles)/infinite-canvas/snippets/initial-client.ts"
+  noCheck
+/>
+
+The `message` event listener is what's interesting here. This will listen for any messages that the server sends
+to us, and then calls our `handleMessage` function- passing us the websocket frame payload in `e.data`. We can safely run
+`JSON.parse` on the payload because we know in our application we are only sending JSON encoded strings. There is nothing
+stopping us from not using JSON, or sending raw bytes- incase we wanted to send multi-media,
+
+Now that we are properly listening for messages, it makes sense to start sending messages to our WS server, which will in-turn
+relay the sent message to all connected clients.
+
+We can do this using the `socket` state we have available. This socket object exposes a method `send`. It allows us to pass in a payload,
+and it will automatically build a valid websocket frame, and then send it to the open TCP connection we made without our `bun` server.
+
+Because we want to share all the actions we perform on our canvas with other players, lets send everything we set to our `geometry` state
+to the WS server:
+
+<FileCodeEditor
+  filePath="./app/blog/(articles)/infinite-canvas/snippets/coordinates.tsx"
+  noCheck
+/>
+
+{/* <InfiniteCanvasWSCoordinator /> */}
+
+Most of this logic is pretty general, and distracts us from what we are really doing inside
+our infinite canvas component. Lets generalize it and move the logic to a seperate hook:
+
+<WithMultiCodeTab
+resettable={false}
+noCheck
+filePaths={[
+
+{
+name: "useWebsocket.ts",
+path: "./app/blog/(articles)/infinite-canvas/snippets/use-websocket.ts",
+},
+
+]}
+
+/>
+
+Some key points in this new hook:
+
+- we are putting the event handlers, that we accept as arguments in `useWebSocket`, in the useEffect dependency arrays.
+  This is the only way we will be able to detect if the callback the user passed is stale, so it will be the consumers responsibility
+  to keep the function reference stable between renders to avoid excessive computation.
+- we track the status of the websocket manually. The socket return from `WebSocket` does expose a status, but the status it exposed
+  is mutated and does not alert react of this change. If we were to read the status of the `socket` we return from the hook during render,
+  it would be impure.
+
+Using this hook, we can implement our multiplayer infinite canvas component in a very simple manner
+
+<WithMultiCodeTab
+  noCheck
+  filePaths={[
+    {
+      name: "InfiniteCanvas.tsx",
+      path: "./app/blog/(articles)/infinite-canvas/InfiniteCanvasFinal.tsx",
+    },
+    {
+      name: "useWebsocket.ts",
+      path: "./app/blog/(articles)/infinite-canvas/snippets/use-websocket.ts",
+    },
+    {
+      name: "canvas-lib.ts",
+      path: "./app/blog/(articles)/infinite-canvas/canvas-lib.tsx",
+    },
+
+    {
+      name: "server.ts",
+      path: "./app/blog/(articles)/infinite-canvas/bun-ws/index.ts",
+    },
+
+]}
+
+>
+
+  <InfiniteCanvasWSCoordinator />
+</WithMultiCodeTab>
+
+All we need to give the `useWebsocket` hook to have multiplayer working is a URL to our WS server, and a handler for incoming
+WS messages.
+
+Now in \<100 lines of code, after our reusable abstractions, we have a multiplayer infintie canvas
+that also supports panning and zooming for free.
+
+### Bonus
+
+If we were to turn on the [react compiler](https://react.dev/learn/react-compiler), we write this component is ~60 lines of code, while stil being performant!
+Thats because we were using useCallback to get a stable function reference on our event handlers to avoid excessive re-draws/event handler setup/teardowns.
+The react compiler can stablize our function referneces for us, letting us not have to think about our function reference changing between renders even if the
+capture group of the function did not change.
+
+<WithMultiCodeTab
+  noCheck
+  filePaths={[
+    {
+      name: "InfiniteCanvas.tsx",
+      path: "./app/blog/(articles)/infinite-canvas/InfiniteCanvasReactCompiler.tsx",
+    },
+    {
+      name: "useWebsocket.ts",
+      path: "./app/blog/(articles)/infinite-canvas/snippets/use-websocket.ts",
+    },
+    {
+      name: "canvas-lib.ts",
+      path: "./app/blog/(articles)/infinite-canvas/canvas-lib.tsx",
+    },
+    {
+      name: "server.ts",
+      path: "./app/blog/(articles)/infinite-canvas/bun-ws/index.ts",
+    },
+  ]}
+>
+  <InfiniteCanvasWSCoordinator />
+</WithMultiCodeTab>
+
+We now have a working multiplayer infintite canvas, along with reusable hooks for any implementation you need.
+
+Though, there are several optimizations we can make to this implementation to improve it, for example:
+
+- Render the canvas off the main thread using `OffscreenCanvas`
+- Use [conflict-free replicated data types (CRDT)](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type) for consistent state between players
+- Virtualize the canvas component to avoid drawing & updating when not on screen
+
+Which I will try to explore and write about at some point :)

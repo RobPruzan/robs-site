@@ -19,6 +19,9 @@ export const InfiniteCanvasWSBefore = () => {
   ]);
   const draw = useCallback<Canvas.Draw>(
     ({ ctx }) => {
+      ctx.fillStyle = "blue";
+      ctx.font = "15px Arial";
+      ctx.fillText("Try clicking me!", 50, 15);
       geometry.forEach((item) => {
         if (item.kind === "circle") {
           ctx.beginPath();

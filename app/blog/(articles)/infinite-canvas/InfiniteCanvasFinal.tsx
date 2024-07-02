@@ -1,6 +1,7 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import * as Canvas from "./canvas-lib";
+import { useWebSocket } from "./useWebSocket";
 export type Geometry = {
   kind: "circle";
   x: number;
@@ -8,15 +9,18 @@ export type Geometry = {
   radius: number;
 };
 
-export const InfiniteCanvasWSAfter = () => {
-  const [geometry, setGeometry] = useState<Array<Geometry>>([
-    {
-      kind: "circle",
-      radius: 20,
-      x: 100,
-      y: 100,
+export const InfiniteCanvasFinal = () => {
+  const [geometry, setGeometry] = useState<Array<Geometry>>([]);
+  const handleMessage = useCallback(
+    ({ parsedJson }: { parsedJson: Geometry }) => {
+      setGeometry((prev) => [...prev, parsedJson]);
     },
-  ]);
+    []
+  );
+  const { socket, status } = useWebSocket<Geometry>({
+    url: "http://localhost:8080",
+    onMessage: handleMessage,
+  });
   const draw = useCallback<Canvas.Draw>(
     ({ ctx }) => {
       geometry.forEach((item) => {
@@ -32,50 +36,9 @@ export const InfiniteCanvasWSAfter = () => {
   );
   const { camera, canvasRef } = Canvas.useInfiniteCanvas({ draw });
 
-  const [socket, setSocket] = useState<null | WebSocket>(null);
-
-  useEffect(() => {
-    const newSocket = new WebSocket("http://localhost:8080");
-    const handleOpen = () => {
-      setSocket(newSocket);
-    };
-    newSocket.addEventListener("open", handleOpen);
-
-    return () => {
-      newSocket.removeEventListener("open", handleOpen);
-      newSocket.close();
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleClose = () => {
-      setSocket(null);
-    };
-    socket?.addEventListener("close", handleClose);
-
-    return () => {
-      socket?.removeEventListener("close", handleClose);
-    };
-  }, [socket]);
-
-  useEffect(() => {
-    if (!socket) {
-      return;
-    }
-
-    const handleMessage = (e: MessageEvent<string>) => {
-      const json = JSON.parse(e.data) as Geometry;
-      setGeometry((prev) => [...prev, json]);
-    };
-    socket.addEventListener("message", handleMessage);
-
-    return () => {
-      socket.removeEventListener("message", handleMessage);
-    };
-  }, [socket]);
   return (
     <div className="relative">
-      {socket && (
+      {status === "open" && (
         <span
           style={{
             color: "rgb(34 197 94)",
@@ -89,6 +52,7 @@ export const InfiniteCanvasWSAfter = () => {
           }}
         />
       )}
+
       <canvas
         style={{
           borderWidth: "1px",

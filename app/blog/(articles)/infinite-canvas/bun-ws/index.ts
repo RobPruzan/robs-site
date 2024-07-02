@@ -1,6 +1,6 @@
 import type { ServerWebSocket } from "bun";
 
-const sockets: Array<ServerWebSocket<unknown>> = []
+let sockets: Array<ServerWebSocket<unknown>> = []
 
 const server = Bun.serve({
   fetch(req, server) {
@@ -9,17 +9,13 @@ const server = Bun.serve({
   },
   websocket: {
     open: (ws) => {
-      console.log('opened',)
       sockets.push(ws)
-      ws.subscribe("canvas");
     },
-    close: () => {
-      console.log('close')
+    close: (ws) => {
+      sockets = sockets.filter(s => s !== ws)
     },
     message: async (ws, message) => {
-
       sockets.forEach(s => ws !== s && s.send(message))
-      ws.publish('canvas', message)
     },
   },
   port: 8080,
