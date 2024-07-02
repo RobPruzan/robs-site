@@ -52,7 +52,6 @@ export const InfiniteCanvasFinal = () => {
           }}
         />
       )}
-
       <canvas
         style={{
           borderWidth: "1px",

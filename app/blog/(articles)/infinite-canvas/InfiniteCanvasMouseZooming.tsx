@@ -1,5 +1,5 @@
 "use client";
-import { MutableRefObject, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 type Geometry = { kind: "circle"; x: number; y: number };
 
 type Coordinate = {
@@ -15,31 +15,6 @@ const toWorld = (screenCoord: Coordinate, camera: Camera): Coordinate => {
     x: camera.x + screenCoord.x / camera.zoom,
     y: camera.y + screenCoord.y / camera.zoom,
   };
-};
-
-const toScreen = (worldCoord: Coordinate, camera: Camera): Coordinate => {
-  return {
-    x: (worldCoord.x - camera.x) * camera.zoom,
-    y: (worldCoord.y - camera.y) * camera.zoom,
-  };
-};
-
-const coordinatesFromMouseEvent = ({
-  event,
-  camera,
-  canvasRef,
-}: {
-  event: { clientX: number; clientY: number };
-  canvasRef: MutableRefObject<HTMLCanvasElement | null>;
-  camera: Camera;
-}) => {
-  const canvas = canvasRef.current;
-  if (!canvas) return;
-
-  const rect = canvas.getBoundingClientRect();
-  const mouseX = event.clientX - rect.left;
-  const mouseY = event.clientY - rect.top;
-  return toWorld({ x: mouseX, y: mouseY }, camera);
 };
 
 export const InfiniteCanvasMouseZooming = () => {

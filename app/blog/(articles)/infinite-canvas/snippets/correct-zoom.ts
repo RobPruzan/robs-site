@@ -1,18 +1,12 @@
 // @ts-nocheck
-const mousePosition = coordinatesFromMouseEvent(event);
-const priorMouseWorldPosition = toWorld({
-  translation,
-  zoom,
-  screenCoordinate: mousePosition,
-});
-const newZoom = zoom * Math.pow(event.deltaY, 0.99);
-const newMouseWorldPosition = toWorld({
-  translation,
-  zoom: newZoom,
-  screenCoordinate: mousePosition,
-});
+const zoomFactor = Math.pow(0.99, e.deltaY);
+const newZoom = camera.zoom * zoomFactor;
+const mouseWorldBefore = toWorld({ x: mouseX, y: mouseY }, camera);
+const newCamera = { ...camera, zoom: newZoom };
+const mouseWorldAfter = toWorld({ x: mouseX, y: mouseY }, newCamera);
 
-setTranslation((prev) => ({
-  x: prev.x + (newMouseWorldPosition.x - priorMouseWorldPosition.x),
-  y: prev.y + (newMouseWorldPosition.y - priorMouseWorldPosition.y),
-}));
+setCamera({
+  x: camera.x + (mouseWorldBefore.x - mouseWorldAfter.x),
+  y: camera.y + (mouseWorldBefore.y - mouseWorldAfter.y),
+  zoom: newZoom,
+});

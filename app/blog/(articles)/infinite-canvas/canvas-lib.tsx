@@ -95,6 +95,7 @@ export const useInfiniteCanvas = ({ draw }: { draw: Draw }) => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
+
     if (!canvas) return;
 
     const handleWheel = (e: WheelEvent) => {
@@ -116,14 +117,13 @@ export const useInfiniteCanvas = ({ draw }: { draw: Draw }) => {
         setCamera({
           x: camera.x + (mouseWorldBefore.x - mouseWorldAfter.x),
           y: camera.y + (mouseWorldBefore.y - mouseWorldAfter.y),
-
           zoom: newZoom,
         });
       } else {
         setCamera((prev) => ({
           ...prev,
-          x: prev.x + e.deltaX / prev.zoom,
-          y: prev.y + e.deltaY / prev.zoom,
+          // ensure the translation is consistent with the current world view (how much we are zoomed in)
+          ...toWorld({ x: e.deltaX, y: e.deltaY }, prev),
         }));
       }
     };
