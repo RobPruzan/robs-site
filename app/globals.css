@@ -69,3 +69,7 @@
 .code-editor {
   outline: none;
 }
+
+.important-information {
+  display: none;
+}
