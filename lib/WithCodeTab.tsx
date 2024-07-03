@@ -77,6 +77,9 @@ export const WithMultiCodeTab = ({
 }) => {
   return (
     <Tabs
+      style={{
+        overflowX: "auto",
+      }}
       defaultValue={children ? "canvas" : filePaths.at(0)?.name}
       // className="w-[400px]"
     >

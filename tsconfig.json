@@ -33,7 +33,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-, "app/test.mdx"  ],
+, "app/test.mdx", "app/blog/(articles)/proximity-chat/page.mdx"  ],
   "exclude": [
     "node_modules"
   ]
