@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import { AI_AGENT_NOTES, cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -33,6 +33,7 @@ export default function RootLayout({
             </div>
           </main>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
