@@ -165,7 +165,7 @@ The desirable behavior here would be to lock screen around the mouse, not `(0,0)
 near the users mouse position will grow in size, rather than move away. Otherwise the user would have to zoom, then translate
 back to the place they to go, zoom, translate, zoom...
 
-Instead of the user performing these uncomfortable set of actions, we could do this for them. every time the user zooms,
+Instead of the user performing these uncomfortable set of actions, we could do this for them. Every time the user zooms,
 keep the camera fixed around the geometry its hovered over by translating the screen the **opposite** amount it would move
 from the zoom.
 
@@ -205,7 +205,7 @@ Otherwise the user would be flying all over the place when panning while zoomed 
 
 Now that we have a working implementation, lets clean up some things.
 
-The canvas may be a little blurry depending on your device resolution, we can make the canvas
+The canvas may be a little blurry depending on your device resolution. We can make the canvas
 use more pixels when rendering objects on devices with higher device pixel ratios (dpr) with:
 
 <FileCodeEditor
@@ -311,17 +311,17 @@ Next we need to make the connection on the client.
 
 The steps we will go to accomplish this is:
 
-1. Setup state in react to hold the socket object returned by `WebSocket`
-2. Setup event listeners for the socket to appropriately react to the sockets current state
+1. Setup state in react to hold the socket object returned by `WebSocket` (the browsers API for making WebSocket connections)
+2. Setup event listeners on the socket so we appropriately react to different states the socket will be in
 
-- It's useful to setup WS event listeners in their own useEffects, it can be bug prone
+- It's useful to setup WS event listeners in their own useEffects. It can be bug prone
   when complexity increases to have several WS listener setups in a single useEffect.
 
-3. Cleanup anything we setup in the useEffect in the cleanup function
+3. Cleanup anything we setup in the useEffect using the cleanup function
 
-- This is a very important step. When our component unmounts the websocket connection will not close automatically. And if
+- This is a very important step. When our component unmounts the WS connection will not close automatically. And if
   the dependencies in our event listener `useEffect`'s change, we will be adding **more** event listeners, without ever removing the previously
-  added listeners. This can be very problematic because the functions set in the even listeners may no longer be correct- due to the
+  added listeners. This can be very problematic because the functions used in the old event listeners may no longer be correct- due to the
   captured values being stale- potentially breaking our application. And even if they are still valid, it can very quickly lead to a
   performance-impacting-memory-leak
 
@@ -365,7 +365,7 @@ Some key points in this new hook:
 - we are putting the event handlers, that we accept as arguments in `useWebSocket`, in the useEffect dependency arrays.
   This is the only way we will be able to detect if the callback the user passed is stale, so it will be the consumers responsibility
   to keep the function reference stable between renders to avoid excessive computation.
-- we track the status of the websocket manually. The socket return from `WebSocket` does expose a status, but the status it exposed
+- we track the status of the websocket manually. The socket returned from `WebSocket` does expose a status, but the status it exposed
   is mutated and does not alert react of this change. If we were to read the status of the `socket` we return from the hook during render,
   it would be impure.
 
@@ -376,8 +376,17 @@ to the WS server:
   filePath="./app/blog/(articles)/infinite-canvas/snippets/coordinates.tsx"
   noCheck
 />
-Using this hook, we can implement our multiplayer infinite canvas component in a
+
+Now that we are sending WS messages, we can use our `useWebSocket.ts` hook to implement our multiplayer infinite canvas component in a
 very simple manner
+
+All we need to give the `useWebsocket` hook to have multiplayer working is a URL to our WS server, and a handler for incoming
+WS messages.
+
+Now in \<100 lines of code, after our reusable abstractions, we have a multiplayer infinite canvas
+that also supports panning and zooming for free.
+
+> **Note!** The below demo uses a real deployed websocket server, with the same code shown in the tabs!
 
 <WithMultiCodeTab
   noCheck
@@ -407,12 +416,6 @@ very simple manner
 
   <InfiniteCanvasWSCoordinator />
 </WithMultiCodeTab>
-
-All we need to give the `useWebsocket` hook to have multiplayer working is a URL to our WS server, and a handler for incoming
-WS messages.
-
-Now in \<100 lines of code, after our reusable abstractions, we have a multiplayer infinite canvas
-that also supports panning and zooming for free.
 
 ### Bonus
 
