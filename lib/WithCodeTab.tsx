@@ -24,7 +24,13 @@ export const WithCodeTab = ({
   replace?: (content: string) => string;
 }) => {
   return (
-    <Tabs defaultValue={children ? "canvas" : "code"} className="w-[400px]">
+    <Tabs
+      style={{
+        overflowX: "auto",
+      }}
+      defaultValue={children ? "canvas" : "code"}
+      className="w-[400px]"
+    >
       <TabsList>
         {children && <TabsTrigger value="canvas">Canvas</TabsTrigger>}
 
