@@ -27,9 +27,10 @@ function withReset<P extends object>(WrappedComponent: ComponentType<P>) {
           <Button
             size={"icon"}
             variant={"ghost"}
-            className="absolute top-0"
+            className="absolute top-0 w-fit h-fit"
             style={{
-              left: -40,
+              left: -25,
+              padding: "4px",
             }}
             onClick={this.reset}
           >
