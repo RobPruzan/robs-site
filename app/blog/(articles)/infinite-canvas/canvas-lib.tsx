@@ -132,5 +132,5 @@ export const useInfiniteCanvas = ({ draw }: { draw: Draw }) => {
     return () => canvas.removeEventListener("wheel", handleWheel);
   }, [camera]);
 
-  return { camera, canvasRef };
+  return { camera, canvasRef, setCamera };
 };

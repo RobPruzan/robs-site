@@ -1,6 +1,8 @@
 import { readFile } from "fs/promises";
+import { ComponentProps } from "react";
+import { SuspenseLoader } from "./SupsenseLoader";
 
-export const EstimatedReadTime = async ({ path }: { path: string }) => {
+export const EstimatedReadTimeContent = async ({ path }: { path: string }) => {
   const wordCount = (await readFile(path, "utf-8")).split(" ").length;
 
   return (
@@ -9,3 +11,11 @@ export const EstimatedReadTime = async ({ path }: { path: string }) => {
     </div>
   );
 };
+
+
+
+export const EstimatedReadTime = (props: ComponentProps<typeof EstimatedReadTimeContent>) => (
+  <SuspenseLoader>
+    <EstimatedReadTimeContent {...props} />
+  </SuspenseLoader>
+);

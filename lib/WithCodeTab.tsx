@@ -8,8 +8,10 @@ import {
 import { readFile } from "fs/promises";
 
 import { PrismEditor } from "./PrismEditor";
+import { ComponentProps } from "react";
+import { SuspenseLoader } from "./SupsenseLoader";
 
-export const WithCodeTab = ({
+const WithCodeTabContent = ({
   children,
   filePath,
   name = "Code",
@@ -43,13 +45,13 @@ export const WithCodeTab = ({
       )}
 
       <TabsContent value="code">
-        <FileCodeEditor replace={replace} filePath={filePath} />
+        <FileCodeEditorContent replace={replace} filePath={filePath} />
       </TabsContent>
     </Tabs>
   );
 };
 
-export const FileCodeEditor = async ({
+export const FileCodeEditorContent = async ({
   filePath,
   noCheck = false,
   replace = (x) => x,
@@ -70,7 +72,7 @@ export const FileCodeEditor = async ({
   );
 };
 
-export const WithMultiCodeTab = ({
+export const WithMultiCodeTabContent = ({
   children,
   filePaths,
   resettable = true,
@@ -118,3 +120,19 @@ export const WithMultiCodeTab = ({
     </Tabs>
   );
 };
+
+export const WithCodeTab = (props: ComponentProps<typeof WithCodeTabContent>) => (
+  <SuspenseLoader>
+    <WithCodeTabContent {...props} />
+  </SuspenseLoader>
+);
+export const FileCodeEditor = (props: ComponentProps<typeof FileCodeEditorContent>) => (
+  <SuspenseLoader>
+    <FileCodeEditorContent {...props} />
+  </SuspenseLoader>
+);
+export const WithMultiCodeTab = (props: ComponentProps<typeof WithMultiCodeTabContent>) => (
+  <SuspenseLoader>
+    <WithMultiCodeTabContent {...props} />
+  </SuspenseLoader>
+);
