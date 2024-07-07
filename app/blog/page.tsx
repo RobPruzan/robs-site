@@ -1,6 +1,6 @@
 import { getDirectories } from "@/lib/getDirectories";
 import Link from "next/link";
-const showArticles = ["infinite-canvas", "proximity-chat"]
+const showArticles = ["infinite-canvas", ]
 export default async function Page() {
   const directoryNames = await getDirectories("./app/blog/(articles)")
   return (
