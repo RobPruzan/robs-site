@@ -36,8 +36,8 @@ export const ProximityChat = () => {
     },
   });
 
-  const { socket } = useWebSocket<Message>({
-    url: "http://localhost:8080",
+  const { socket, status } = useWebSocket<Message>({
+    url: "http://localhost:8080?roomName=global",
     onMessage: ({ parsedJson }) => {
       switch (parsedJson.kind) {
         case "webRTC-offer": {
@@ -51,38 +51,17 @@ export const ProximityChat = () => {
     useState<RTCPeerConnection | null>(null);
 
   useEffect(() => {
-    console.log("??");
-    const handleKeyDown = (e: { key: string }) => {
+    const handleKeyDown = (e: { key: string; preventDefault: () => void }) => {
       console.log("keydown", e.key);
+
+      // e.preventDefault();
       switch (e.key) {
         case "w": {
-          console.log("1");
           setPlayers((prev) =>
             prev.map((player) => {
               if (player.id !== userId) {
                 return player;
               }
-
-              const canvasBottomRight = toWorld(
-                {
-                  x: 300,
-                  y: -300,
-                },
-                camera
-              );
-
-              const canvasOrigin = toWorld(
-                {
-                  x: 0,
-                  y: 0,
-                },
-                camera
-              );
-
-              // bounds check to make camera follow
-
-              // const width = canvasBottomRight.x;
-              // const height = canvasBottomRight.y * -1;
 
               return {
                 ...player,
@@ -93,7 +72,6 @@ export const ProximityChat = () => {
           return;
         }
         case "a": {
-          console.log("2");
           setPlayers((prev) =>
             prev.map((player) => {
               if (player.id !== userId) {
@@ -108,7 +86,6 @@ export const ProximityChat = () => {
           return;
         }
         case "s": {
-          console.log("3");
           setPlayers((prev) =>
             prev.map((player) => {
               if (player.id !== userId) {
@@ -124,7 +101,6 @@ export const ProximityChat = () => {
           return;
         }
         case "d": {
-          console.log("4");
           setPlayers((prev) =>
             prev.map((player) => {
               if (player.id !== userId) {
@@ -148,17 +124,31 @@ export const ProximityChat = () => {
   }, []);
 
   return (
-    <div className="flex flex-col">
-      <button>Join Call</button>
-      <canvas
-        // onKeyDown={}
-        style={{
-          border: "2px solid white",
-        }}
-        ref={canvasRef}
-        width={300}
-        height={300}
-      />
+    <div className="flex flex-col ">
+      <div className="flex items-center gap-x-5">
+        {status === "open" && (
+          <span className="rounded-full bg-green-500 h-6 w-6"></span>
+        )}
+        <button className="">Join Call</button>
+      </div>
+      {/* {JSON.stringify(status)} */}
+
+      <div className="flex">
+        <canvas
+          style={{
+            border: "2px solid white",
+          }}
+          ref={canvasRef}
+          width={300}
+          height={300}
+        />
+        <div className="flex border">
+          <span>User List</span>
+        </div>
+        <div className="flex border">
+          <span>Call List</span>
+        </div>
+      </div>
     </div>
   );
 };
