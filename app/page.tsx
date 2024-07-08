@@ -35,13 +35,16 @@ export default function Home() {
       </div>
 
       <span>
-        Hello! I'm Robby, a computer science student. This website is for
-        documenting my experiences while building different projects. Check out
-        the
+        This website is for documenting my experiences while building different
+        projects. Check out the
         <Link className="text-blue-500 underline mx-2" href={"/blog"}>
           blog
         </Link>
         to see what I've written so far!
+      </span>
+      <span>
+        Most recently, I've been interested in functional programming and real
+        time technologies <span className="text-yellow-500 text-2xl ">⚡</span>
       </span>
       <span className="text-xl w-full text-start">Projects</span>
       <div className="flex w-full justify-start">
