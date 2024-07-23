@@ -3,7 +3,7 @@ import { Geometry } from "./SimpleCanvasMultiplayer"
 
 export const useWebSocket = <T>({ onClose,onError,onMessage,onOpen,url}: {
   onOpen?: (event: Event) => void
-  onMessage?: (message: MessageEvent<unknown> & {parsedJson: T}, ) => void
+  onMessage?: (message: MessageEvent<unknown> & {parsedJson: T, socket: WebSocket}, ) => void
   onError?: (error: Event) => void
   onClose?: (e: Event) => void
   url: string
@@ -70,7 +70,7 @@ export const useWebSocket = <T>({ onClose,onError,onMessage,onOpen,url}: {
         return
       }
       const json = JSON.parse(e.data) as T;
-      onMessage({...e, parsedJson: json})
+      onMessage({...e, parsedJson: json, socket})
     };
     socket.addEventListener("message", handleMessage);
   

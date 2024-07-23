@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useId, useState } from "react";
-import { toWorld, useInfiniteCanvas } from "../../infinite-canvas/canvas-lib";
+import { useInfiniteCanvas } from "../../infinite-canvas/canvas-lib";
 import { useWebSocket } from "../../infinite-canvas/useWebSocket";
 
 type Player = {
@@ -8,11 +8,29 @@ type Player = {
   y: number;
   id: string;
 };
+const iceConfig = {
+  iceServers: [{ urls: ["stun:stun2.1.google.com:19302"] }],
+};
 
-type Message =
-  | { kind: "webRTC-offer" }
-  | { kind: "webRTC-answer" }
-  | { kind: "webRTC-description" };
+type ClientServerSplit<TClient, TServer> = {
+  clientInfo: TClient;
+  serverInfo: TServer;
+};
+type ClientInfo =
+  | {
+      kind: "webRTC-offer";
+      offer: RTCSessionDescriptionInit;
+      fromUserId: string;
+    }
+  | {
+      kind: "webRTC-answer";
+      answer: RTCSessionDescriptionInit;
+      fromUserId: string;
+    }
+  | { kind: "webRTC-candidate"; fromUserId: string }
+  | { kind: "webRTC-description"; fromUserId: string };
+type ServerInfo = { toUserId: string };
+type Message = ClientServerSplit<ClientInfo, ServerInfo>;
 export const ProximityChat = () => {
   const userId = useId();
 
@@ -35,20 +53,52 @@ export const ProximityChat = () => {
       });
     },
   });
+  const [webRTCConnections, setWebRTCConnections] = useState<
+    Array<{ webRTCConnection: RTCPeerConnection; withUserId: string }>
+  >([]);
 
-  const { socket, status } = useWebSocket<Message>({
+  const { socket, status } = useWebSocket<ClientInfo>({
     url: "http://localhost:8080?roomName=global",
-    onMessage: ({ parsedJson }) => {
+    onMessage: async ({ parsedJson, socket }) => {
       switch (parsedJson.kind) {
         case "webRTC-offer": {
+          const newWebRTCConnection = new RTCPeerConnection(iceConfig);
+          setWebRTCConnections((prev) => [
+            ...prev,
+            {
+              webRTCConnection: newWebRTCConnection,
+              withUserId: parsedJson.fromUserId,
+            },
+          ]);
+          const answer = await newWebRTCConnection.createAnswer();
+          newWebRTCConnection.setLocalDescription(answer);
+          socket.send(
+            JSON.stringify({
+              clientInfo: {
+                kind: "webRTC-answer",
+                answer,
+                fromUserId: userId,
+              },
+              serverInfo: {
+                toUserId: parsedJson.fromUserId,
+              },
+            } satisfies Message)
+          );
           return;
+        }
+        case "webRTC-answer": {
+          const description = parsedJson.answer;
+          const connection = webRTCConnections.find(
+            (connection) => connection.withUserId === parsedJson.fromUserId
+          );
+          if (!connection) {
+            return;
+          }
+          connection.webRTCConnection.setRemoteDescription(description);
         }
       }
     },
   });
-
-  const [webRTCConnection, setWebRTCConnection] =
-    useState<RTCPeerConnection | null>(null);
 
   useEffect(() => {
     const handleKeyDown = (e: { key: string; preventDefault: () => void }) => {
