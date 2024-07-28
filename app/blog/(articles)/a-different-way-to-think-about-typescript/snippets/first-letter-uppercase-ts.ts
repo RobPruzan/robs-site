@@ -8,7 +8,5 @@ const firstLetterUppercase = (t: string): string => {
     return "";
   }
   const [firstWord, restWords] = separateFirstWord(t);
-  return `${firstWord[0].toUpperCase()}${firstWord.slice(
-    1
-  )} ${firstLetterUppercase(restWords)}`; // recursive call
+  return `${firstWord[0].toUpperCase()}${firstWord.slice(1)} ${firstLetterUppercase(restWords)}`; // recursive call
 };
