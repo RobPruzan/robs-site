@@ -40,7 +40,7 @@ export default function Home() {
         <Link className="text-blue-500 underline mx-2" href={"/blog"}>
           blog
         </Link>
-        to see what I've written so far!
+        to see what I've written so far.
       </span>
       <span>
         Most recently, I've been interested in functional programming and real
@@ -113,7 +113,7 @@ export default function Home() {
           <TimelineItem
             date="Feb 2022 – May 2023"
             title="Research Assistant at XLAB"
-            description="Worked on developing and deploying a transformer-based pipeline to identify poor vocabulary diversity and recommend replacement words"
+            description="Worked on developing and deploying a transformer-based pipeline to identify poor vocabulary diversity and recommend replacement words & performed research on point cloud transformer classification models for autonomous vehicles"
           />
         </ol>
       </div>

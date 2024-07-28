@@ -10,7 +10,7 @@
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
-     "module": "es6",
+    "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -32,8 +32,10 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
-, "app/test.mdx", "app/blog/(articles)/proximity-chat/page.mdx"  ],
+    ".next/types/**/*.ts",
+    "app/test.mdx",
+    "app/blog/(articles)/proximity-chat/page.mdx"
+  ],
   "exclude": [
     "node_modules"
   ]
