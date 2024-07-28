@@ -217,7 +217,7 @@ Comparing the runtime example to the type level example:
 
 - if statements to generate a base case are replaced with if subset checks (`extends`)
   - this looks a lot like an if statement because each of the sets made using `infer` (`R`, `RestWord`, `RestSentence`) only contain a single string literal
-- splitting a sentence in a word and the rest of the sentence using destructuring is replaced with `infer` mapping over 3 sets- `${infer R}${infer RestWord} ${infer RestSentence}`
+- splitting a sentence into the first word and the rest of the sentence, using destructuring, is replaced with `infer` mapping over 3 sets- `${infer R}${infer RestWord} ${infer RestSentence}`
 - function parameters are replaced with type parameters
 - recursive function calls are replaced with recursive type instantiations
 
@@ -226,6 +226,6 @@ We have the ability to describe any computation using these abilities (the type 
 ## Conclusion
 
 If you are able to think of TypeScript as being a very expressive way to operate over sets, and using those sets to enforce strict compile time checks,
-you will most likely start get more comfortable with advanced typescript features, allowing you catch more bugs early.
+you will most likely start to get more comfortable with advanced typescript features (if not already), allowing you catch more bugs early.
 
 This mental model is not perfect, but it holds up pretty well even with some of TypeScript's most advanced features.
