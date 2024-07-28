@@ -17,7 +17,7 @@ export const ContentNavbar = () => {
       >
         Profile
       </Link>
-      <div className="flex items-center">
+      <div className="flex items-end">
         <Link
           href={"/blog"}
           className={cn([path.at(-1) !== "blog" && "text-muted-foreground"])}

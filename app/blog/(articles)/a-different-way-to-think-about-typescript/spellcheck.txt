@@ -1,0 +1,229 @@
+import Image from "next/image";
+import { SuspenseEditor } from "../../../../lib/WithCodeTab.tsx";
+import { EstimatedReadTime } from "../../../../lib/EstimatedReadTime";
+
+<EstimatedReadTime path="./app/blog/(articles)/a-different-way-to-think-about-typescript/page.mdx" />
+# Types -> Sets
+
+The TypeScript type system can be thought of as a purely functional language that operates over types. But what does it mean to operate over a type?
+For me, I find resolving types into the set of items it can construct very useful. This set would contain every real value that is
+assignable to that type.
+
+Then the syntax TypeScript exposes is functionality to operate over items in any given set, just like how you might operate over a real set
+in a normal programming language.
+
+Because TypeScript is a structural type system, as opposed to nominal, this "set" the type constructs can be more useful than the actual type
+definition itself.
+
+If we think of each type as the set of literals- real values- it can construct, we could say a string is just the infinite set of every permutation
+of characters, or a `number` is the infinite set of every permutation of digits.
+
+<Image
+  src="/typescript-article/numbers-and-strings.png"
+  height="600"
+  width="600"
+/>
+
+Once you start thinking about the type system as a proper functional programming language
+that is meant solely for processing sets, things start to get a little easier.
+
+> **Note** I am not implying that sets and types are equivalent, they are not.
+
+### Breaking apart TypeScript primitives
+
+#### Intersection (&)
+
+Intersection (&) is a great example where this mental model helps you reason about the operation better. Given the following example
+
+<SuspenseEditor filePath="./app/blog/(articles)/a-different-way-to-think-about-typescript/snippets/intersect-foos.ts" />
+
+We are intersecting Bar and Baz. Your first though might be the intersection operation was applied the following way:
+
+<Image
+  src="/typescript-article/wrong-intersection.png"
+  height="400"
+  width="400"
+/>
+
+Where we identify the overlap between the 2 objects, and take that as a result. But... there is no overlap? The left hand side soley has x,
+and the right hand side solely has y, albeit both numbers. So why would the intersection result in a type where this is allowed:
+
+<SuspenseEditor filePath="./app/blog/(articles)/a-different-way-to-think-about-typescript/snippets/foo.ts" />
+
+An easier way to think about what is happening is to resolve the types `Bar` and `Baz` into the sets they construct, not what it looks like in text.
+
+When we define a type of `{ y: number }`, we can construct an infinite set of object literals that at least have the property y in them, where y is a number:
+
+<Image src="/typescript-article/correct-set.png" height="400" width="400" />
+
+> **Note:** Notice how I said "set of object types that at least have the property y in them". That's why properties other than y
+> exist in some object types. If you had a variable that had type `{y: number}`, it wouldn't matter to you if the object had other properties
+> than y inside of it, as long as it did have y:number, hence why TypeScript allows it.
+
+Now that we know how to replace types with the sets they construct, intersections make a lot more sense:
+
+<Image
+  src="/typescript-article/correct-intersection.png"
+  height="600"
+  width="600"
+/>
+#### Unions
+
+Using the previous mental model we established, this is trivial, we just take the union of 2 sets to get our new set
+
+<SuspenseEditor filePath="./app/blog/(articles)/a-different-way-to-think-about-typescript/snippets/union-foo.ts" />
+
+<Image src="/typescript-article/correct-union.png" height="600" width="600" />
+#### Pattern matching sets
+
+Because the TypeScript maintainers thought it would be convinient, they built primitives into the language to let us introspect these sets.
+For example, we can check if one set is the subset of another, and return a new set in the true/false case using the `extends` keywords.
+
+<SuspenseEditor filePath="./app/blog/(articles)/a-different-way-to-think-about-typescript/snippets/introspect-foo.ts" />
+
+Where we are checking if the LHS set of the extends keyword is a subset of the RHS set
+
+This is quite powerful because we can arbitrarily nest these
+
+<SuspenseEditor filePath="./app/blog/(articles)/a-different-way-to-think-about-typescript/snippets/introspect-foo-nested.ts" />
+
+But things get weird when we use type parameters. Typescript makes the decision to perform the subset check for every member
+of the union individually when type parameters are used, as opposed to resolving the union to a constructed set first.
+
+So, when slightly altering the previous example to use type parameters:
+
+<SuspenseEditor filePath="./app/blog/(articles)/a-different-way-to-think-about-typescript/snippets/introspect-foo-generic.ts" />
+
+Typescript will transform `Result` into:
+
+<SuspenseEditor filePath="./app/blog/(articles)/a-different-way-to-think-about-typescript/snippets/introspect-foo-result.ts" />
+
+making `Result` resolve to:
+
+`"T constructs a set containing only number" |
+  "T constructs a set with items not included in number | null";`
+
+Which is simply because this is more convenient for most operations. But, we can force TypeScript to not do this using tuple syntax
+
+<SuspenseEditor filePath="./app/blog/(articles)/a-different-way-to-think-about-typescript/snippets/introspect-foo-working.ts" />
+
+which is because we are no longer applying the conditional type on a union, we are applying it to a tuple which happens to have a union inside of it.
+
+This edge case is important because it goes to show the mental model of always resolving types to the sets they construct immediately is not perfect.
+
+#### Deconstruction
+
+One core feature of pattern matching is missing from the above example: deconstruction.
+
+Most people are familiar with construction in language, as we use constructors in most languages to create objects.
+
+If we wanted to construct an object in TypeScript we could write:
+
+<SuspenseEditor filePath="./app/blog/(articles)/a-different-way-to-think-about-typescript/snippets/deconstruction.ts" />
+
+Deconstruction is the exact opposite of construction, but tends to use similar syntax. You are already use it all the time through object destructuring:
+
+<SuspenseEditor filePath="./app/blog/(articles)/a-different-way-to-think-about-typescript/snippets/deconstruction-x.ts" />
+
+When we destructure an object we:
+
+- Assert, at compile time, the object is of the shape `{x :any}`. TypeScript would throw a compile time error if we wrote:
+
+  <SuspenseEditor filePath="./app/blog/(articles)/a-different-way-to-think-about-typescript/snippets/deconstruct-2.ts" />
+
+- Get the data inside of myObject that has a key of x (myObject["x"])
+- Create a new const variable, also named x, and put that data inside of it
+
+What this might look like in javascript without using destructuring is:
+
+<SuspenseEditor filePath="./app/blog/(articles)/a-different-way-to-think-about-typescript/snippets/deconstruct-js.ts" />
+
+Now, lets see how we can do the same thing in TypeScript at the type level using the mental model of sets.
+
+We already know we can check the structure of a set and perform logic based off of that, but we can also destructure our sets using patterns.
+
+<SuspenseEditor filePath="./app/blog/(articles)/a-different-way-to-think-about-typescript/snippets/partion.ts" />
+
+This snippet has a new keyword used: `infer`. `infer` in TypeScript is how we can deconstruct a set into parts if the set meets a pattern. If we didn't use `infer`
+in the previous snippet, TypeScript would think R refers to an existing type, and would error. We need a keyword here to tell TypeScript "this is a new type, and will describe
+the set that meets the pattern I defined"
+
+In our case the pattern is:
+
+`<any type> | null`
+
+and if it matches that pattern, assign `<any type>` to a temporary type `R`. Then this temporary type R will be available in the `true` ternary
+branch.
+
+Because it's available, we can directly return R as the final type of `NotNull<T>`
+
+We could replicate this functionality without the `infer keyword`, but this saves us from a lot of complexity when patterns get more complex.
+
+This is probably TypeScript's most powerful feature, and is extremely practical. If you ever have a complex type and only need a very small piece of it,
+`infer` allows you to describe very complex patterns to extract it.
+
+#### Transforming sets
+
+We just described how TypeScript allows us to check very precisely whether or not a set looks like something, and deconstruct them based on that, but
+it would be very useful if we could describe ourselves what each item in a set should look like. If we can precisely describe this,
+we can build anything we want:
+
+- [SQL parser in TypeScript](https://github.com/codemix/ts-sql)
+- [GraphQL parser in TypeScript](https://github.com/Svehla/Typescript-GraphQL-AST-parser)
+
+#### Objects and mapped types
+
+Mapped types have a very simple initial use, map over every item in the set the type constructs to create an object type.
+
+For example:
+
+<SuspenseEditor filePath="./app/blog/(articles)/a-different-way-to-think-about-typescript/snippets/bools-and-numbers.ts" />
+
+In our minds, we can then map the object type back to a set. So in this mental model,
+a mapped type is a higher-order operation- we map over a set to create a type. Here's what that looks like:
+
+<Image src="/typescript-article/mapped-types.png" height="400" width="400" />
+
+We can also map over a subset of strings:
+
+<SuspenseEditor filePath="./app/blog/(articles)/a-different-way-to-think-about-typescript/snippets/map-subset.ts" />
+
+Here we map over the set `["string", "bar"]` to create an object type => `{string: "string", bar: "bar"}` which then describes a set that can be constructed.
+
+We can perform arbitrary type level computation on the key and value of the object type:
+
+<SuspenseEditor filePath="./app/blog/(articles)/a-different-way-to-think-about-typescript/snippets/map-complex.ts" />
+
+> **Note:** `never` is the empty set- there exists no values in the set- so a value with type never can **never** be assigned anything
+
+Now we mapped over the set `["string", "bar"]` to create the new type =>
+
+`{["IM A s"]: "s", ["IM A b"]: "b"}`
+
+#### Repetitive logic
+
+What if we wanted to perform some transformation to a set, but the transformation is quite difficult to represent. It needs to run its inner computation
+some arbitrary amount of times before moving to the next item. In a runtime programming language we would trivially reach for loops. But as TypeScript's
+type system is a functional language, we will reach for recursion
+
+<SuspenseEditor filePath="./app/blog/(articles)/a-different-way-to-think-about-typescript/snippets/first-letter-uppercase.ts" />
+
+Now first... lol what. This may look insane, but it's really just dense code, it's not complicated. Lets write a TypeScript runtime version to expand what's happening:
+
+<SuspenseEditor filePath="./app/blog/(articles)/a-different-way-to-think-about-typescript/snippets/first-letter-uppercase-ts.ts" />
+
+The gist is we get the first word of the current sentence, upper case it, and then do the same for the rest of the sentence.
+
+Comparing the runtime example to the type level example:
+
+- if statements to generate a base case are replaced with if subset checks (`extends`)
+- object destructuring is replaced with `infer`
+- function parameters are replaced with type parameters
+- recursive function calls are replaced with recursive type instantiations
+
+We have the ability to describe any computation we want because of these abilities (the type system is turing complete).
+
+## Conclusion
+
+If you are able to shift your mental model of TypeScript to it being a very expressive way to operate over sets, and using those sets to enforce strict compile time checks,
+you will most likely start get more comfortable with advanced typescript features.

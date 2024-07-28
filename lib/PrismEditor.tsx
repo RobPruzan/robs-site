@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Editor from "react-simple-code-editor";
 import { highlight, languages } from "prismjs";
 import "prismjs/components/prism-typescript";
-import "prismjs/themes/prism-solarizedlight.css"; // Choose your preferred theme
+import "prismjs/themes/prism-dark.css"; 
 
 import "prismjs/components/prism-jsx";
 import "prismjs/components/prism-tsx";

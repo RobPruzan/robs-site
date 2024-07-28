@@ -8,8 +8,9 @@ import {
 import { readFile } from "fs/promises";
 
 import { PrismEditor } from "./PrismEditor";
-import { ComponentProps } from "react";
+import { ComponentProps, Suspense } from "react";
 import { SuspenseLoader } from "./SupsenseLoader";
+import { Loader2 } from "lucide-react";
 
 const WithCodeTabContent = ({
   children,
@@ -53,7 +54,7 @@ const WithCodeTabContent = ({
 
 export const FileCodeEditorContent = async ({
   filePath,
-  noCheck = false,
+  noCheck = true,
   replace = (x) => x,
 }: {
   filePath: string;
@@ -63,12 +64,25 @@ export const FileCodeEditorContent = async ({
   const fileContent = await readFile(filePath, "utf-8");
 
   const afterNoChecked = noCheck
-    ? fileContent.replace("// @ts-nocheck\n", "")
+    ? fileContent.replace("// @ts-nocheck\n", "").replace("// @ts-ignore\n", "")
     : fileContent;
   return (
     <PrismEditor
       code={replace(afterNoChecked.replace(`"use client";\n`, ""))}
     />
+  );
+};
+
+export const SuspenseEditor = (props: {
+  filePath: string;
+  noCheck?: boolean;
+  replace?: (content: string) => string;
+}) => {
+  console.log("RECIEVED", props);
+  return (
+    <Suspense fallback={<Loader2 className="animate-spin" size={20} />}>
+      <FileCodeEditorContent {...props}/>
+    </Suspense>
   );
 };
 
@@ -121,17 +135,23 @@ export const WithMultiCodeTabContent = ({
   );
 };
 
-export const WithCodeTab = (props: ComponentProps<typeof WithCodeTabContent>) => (
+export const WithCodeTab = (
+  props: ComponentProps<typeof WithCodeTabContent>
+) => (
   <SuspenseLoader>
     <WithCodeTabContent {...props} />
   </SuspenseLoader>
 );
-export const FileCodeEditor = (props: ComponentProps<typeof FileCodeEditorContent>) => (
+export const FileCodeEditor = (
+  props: ComponentProps<typeof FileCodeEditorContent>
+) => (
   <SuspenseLoader>
     <FileCodeEditorContent {...props} />
   </SuspenseLoader>
 );
-export const WithMultiCodeTab = (props: ComponentProps<typeof WithMultiCodeTabContent>) => (
+export const WithMultiCodeTab = (
+  props: ComponentProps<typeof WithMultiCodeTabContent>
+) => (
   <SuspenseLoader>
     <WithMultiCodeTabContent {...props} />
   </SuspenseLoader>
