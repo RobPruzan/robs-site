@@ -78,7 +78,6 @@ export const SuspenseEditor = (props: {
   noCheck?: boolean;
   replace?: (content: string) => string;
 }) => {
-  console.log("RECIEVED", props);
   return (
     <Suspense fallback={<Loader2 className="animate-spin" size={20} />}>
       <FileCodeEditorContent {...props}/>

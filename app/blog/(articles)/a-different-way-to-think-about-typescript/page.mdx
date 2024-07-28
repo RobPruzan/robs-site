@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { SuspenseEditor } from "../../../../lib/WithCodeTab.tsx";
 import { EstimatedReadTime } from "../../../../lib/EstimatedReadTime";
+import Link from "next/link";
 
 <EstimatedReadTime path="./app/blog/(articles)/a-different-way-to-think-about-typescript/page.mdx" />
 # Types -> Sets
@@ -12,10 +13,10 @@ assignable to that type.
 Then TypeScript's core syntax is functionality to operate over items in any given set, just like how you might operate over a real set
 in a normal programming language.
 
-Because TypeScript is a structural type system, as opposed to nominal, this "set" the type constructs can be more useful than the actual type
+Because TypeScript is a <Link href="https://www.typescript-training.com/course/fundamentals-v3/05-structural-vs-nominal-types/" >structural type system</Link>, as opposed to nominal, this "set" the type constructs can be more useful than the actual type
 definition itself (but not always).
 
-If we think of each type as the set of literals- real values- it can construct, we could say a string is just the infinite set of every permutation
+If we think of each type as the set of <Link href="https://www.typescriptlang.org/docs/handbook/literal-types.html"> literals</Link>- real values- it can construct, we could say a string is just the infinite set of every permutation
 of characters, or a `number` is the infinite set of every permutation of digits.
 
 <Image
@@ -30,7 +31,7 @@ that is meant solely for processing sets, more advanced features can get a littl
 This article will go through most of typescripts features through the lens of: types are the sets
 they can create and typescript is a functional programming language that operates on sets
 
-> **Note** I am not implying that sets and types are equivalent, they are not.
+> **Note** I am not implying that sets and types are equivalent, <Link href="https://cs.stackexchange.com/questions/91330/what-exactly-is-the-semantic-difference-between-set-and-type#answer-91345"> they are not.</Link>
 
 ### Breaking apart TypeScript primitives
 
@@ -48,8 +49,8 @@ We are intersecting Bar and Baz. Your first though might be the intersection ope
   width="400"
 />
 
-Where we identify the overlap between the 2 objects, and take that as a result. But... there is no overlap? The left hand side solely has x,
-and the right hand side solely has y, albeit both numbers. So why would the intersection result in a type where this is allowed:
+Where we identify the overlap between the 2 objects, and take that as a result. But... there is no overlap? The left hand side (LHS) solely has x,
+and the right hand side (RHS) solely has y, albeit both numbers. So why would the intersection result in a type where this is allowed:
 
 <SuspenseEditor filePath="./app/blog/(articles)/a-different-way-to-think-about-typescript/snippets/foo.ts" />
 
@@ -84,7 +85,7 @@ For example, we can check if one set is the subset of another, and return a new 
 
 <SuspenseEditor filePath="./app/blog/(articles)/a-different-way-to-think-about-typescript/snippets/introspect-foo.ts" />
 
-Where we are checking if the LHS set of the extends keyword is a subset of the RHS set
+Where we are checking if the LHS set of the <Link href="https://www.typescriptlang.org/docs/handbook/2/conditional-types.html">extends keyword</Link> is a subset of the RHS set
 
 This is quite powerful because we can arbitrarily nest these
 
@@ -162,7 +163,7 @@ Visually we can describe this process as:
 With this mental model, TypeScript using the word `infer` actually makes sense. It's automatically finding a type that would describe how to create
 the set we made- R`.
 
-#### Type Transformation
+#### Type Transformation- mapped types
 
 We just described how TypeScript allows us to check very precisely whether or not a set looks like something, and map them based on that.
 Though, it would be useful if we could be more expressive in what each item in a set, constructed by a type, looks like. If we can describe
@@ -171,9 +172,8 @@ this set well, we can make whatever we want:
 - [SQL parser in TypeScript types](https://github.com/codemix/ts-sql)
 - [GraphQL parser in TypeScript types](https://github.com/Svehla/Typescript-GraphQL-AST-parser)
 
-#### Objects and mapped types
-
-Mapped types have a very simple initial use, map over every item in the set to create an object type.
+Mapped types are a good example of this, and have a very simple initial use, map over every
+item in the set to create an object type.{" "}
 
 For example:
 
@@ -216,8 +216,8 @@ We get the first word of the current sentence, upper case the words first letter
 Comparing the runtime example to the type level example:
 
 - if statements to generate a base case are replaced with if subset checks (`extends`)
-  - this looks a lot like an if statement because both sets (`RestWord`, `RestSentence`) only contain a single string literal
-- splitting a sentence in a word and the rest of the sentence using destructuring is replaced with `infer` mapping over 2 sets- `${infer RestWord} ${infer RestSentence}`
+  - this looks a lot like an if statement because each of the sets made using `infer` (`R`, `RestWord`, `RestSentence`) only contain a single string literal
+- splitting a sentence in a word and the rest of the sentence using destructuring is replaced with `infer` mapping over 3 sets- `${infer R}${infer RestWord} ${infer RestSentence}`
 - function parameters are replaced with type parameters
 - recursive function calls are replaced with recursive type instantiations
 
@@ -228,4 +228,4 @@ We have the ability to describe any computation using these abilities (the type 
 If you are able to think of TypeScript as being a very expressive way to operate over sets, and using those sets to enforce strict compile time checks,
 you will most likely start get more comfortable with advanced typescript features, allowing you catch more bugs early.
 
-This mental model is not perfect, but it holds up pretty well even with some of typescripts most advanced features.
+This mental model is not perfect, but it holds up pretty well even with some of TypeScript's most advanced features.
