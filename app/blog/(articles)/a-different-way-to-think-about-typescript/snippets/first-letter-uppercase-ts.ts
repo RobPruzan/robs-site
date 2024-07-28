@@ -1,8 +1,4 @@
-const isSingleWord = (t: string) => {
-  return t.split(" ").length === 0;
-};
-
-const seperateFirstWord = (t: string) => {
+const separateFirstWord = (t: string) => {
   const [firstWord, ...restWords] = t.split(" ");
   return [firstWord, restWords.join(" ")];
 };
@@ -14,8 +10,8 @@ const firstLetterUppercase = (t: string): string => {
     // base case
     return "";
   }
-  const [firstWord, restWords] = seperateFirstWord(t);
+  const [firstWord, restWords] = separateFirstWord(t);
   return `${uppercase(firstWord[0])}${firstWord.slice(
     1
-  )} ${firstLetterUppercase(restWords)}`; // recurssive call
+  )} ${firstLetterUppercase(restWords)}`; // recursive call
 };

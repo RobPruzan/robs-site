@@ -8,7 +8,7 @@ import { ContentNavbar } from "./ContentNavbar";
 
 export const metadata: Metadata = {
   title: "Robby's blog",
-  description: `C computer science student who will be documenting different things I've learned/ built over time.`,
+  description: `log of things i've learned and built overtime`,
 };
 
 export default function RootLayout({
