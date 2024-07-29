@@ -35,8 +35,7 @@ export default function Home() {
       </div>
 
       <span>
-        This website is for documenting my experiences while building different
-        projects. Check out the
+     This website servers as a log of things i've learned and built overtime. Check out the
         <Link className="text-blue-500 underline mx-2" href={"/blog"}>
           blog
         </Link>
