@@ -216,11 +216,11 @@ This dependency tree is more inline with how react determines to re-render compo
 
 We now have 2 tree representations we need to reference to correctly re-render a component. One that determines how the DOM should look, and the other that determines when components need to re-render.
 
-To actually build this dependency tree, we need to know in which component a given component was defined. This works because after you call createElement, there's no way to update its props:
+The only information we need to build this dependency tree is knowing which component a given component was called in. The component some given component was called in will be marked as the parent. This works because after you call createElement, there's no way to update the elements props:
 
 <SuspenseEditor filePath="./app/blog/(articles)/react-from-scratch/snippets/18.tsx" />
 
-So all we have to do is track which component the `createElement` call happened in. We can do this with not too much effort:
+So all we have to do is track which component the `createElement` call happened in to build up a valid dependency tree. We can do this with not too much effort:
 
 - Before a component is rendered, create a dependency tree node for it, and store it globally so `createElement` can access it (essentially the same as the currently rendering component talked about earlier)
 - For every `createElement` call, push a new render node, representing the component an element was created for, as a child of the globally accessible render node
