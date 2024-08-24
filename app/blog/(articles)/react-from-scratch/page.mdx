@@ -225,7 +225,8 @@ So all we have to do is track which component the `createElement` call happened 
 - Before a component is rendered, create a dependency tree node for it, and store it globally so `createElement` can access it (essentially the same as the currently rendering component talked about earlier)
 - For every `createElement` call, push a new render node, representing the component an element was created for, as a child of the globally accessible render node
 
-> Note: This strategy is only close to what I ended up doing. I a chose a more roundabout method so it would play nicely with my existing code. The general idea of what I really did was:
+> Note: This strategy is only close to what I ended up doing.
+> I ended up implementing a more roundabout method so it would play nicely with my existing code. The general idea of what I really did was:
 >
 > - take the output internal metadata by a component (a tree like structure), and flatten it into an array
 > - If any node inside the array is already in the render tree, it must have been called earlier, so filter it out
