@@ -29,7 +29,7 @@ Full Code: <Link href="https://github.com/RobPruzan/react-scratch">https://githu
 - [Final result](#the-final-result)
 - [Conclusion](#conclusion)
 
-My goal here is to walk through my process of building react from the groundup, hopefully giving you an intuition to why things behave the way they do in react. There are many cases where react leaks its abstraction in the interface, so learning how the internals **could** by implemented is extremely useful to understand the motivation behind those interface designs.
+**My** goal here is to walk through my process of building react from the groundup, hopefully giving you an intuition to why things behave the way they do in react. There are many cases where react leaks its abstraction in the interface, so learning how the internals **could** by implemented is extremely useful to understand the motivation behind those interface designs.
 
 But, I'm not trying to follow the same implementation that the react team did. I didn't even know the internal architecture before coding this up. Just high level concepts like virtual dom's and reconciliation.
 
@@ -200,7 +200,7 @@ But, for the following code, what do we expect the parent-child relationship to 
 
 <SuspenseEditor filePath="./app/blog/(articles)/react-from-scratch/snippets/17.tsx" />
 
-Another way to ask that question is, if component A re-renders, should component b re-render? Lets take a look at what our current view tree would look like:
+Another way to ask that question is, if `ComponentA` re-renders, should `ComponentB` re-render? Lets take a look at what our current view tree would look like:
 
 <Image src="/react-from-scratch/image-1.png" height="300" width="200" />
 

@@ -17,7 +17,7 @@ const generateViewTree = ({
         children: internalMetadata.children,
       });
 
-      const subViewTree = generateViewTreeHelper({
+      const subViewTree = generateViewTree({
         internalMetadata: nextNodeToProcess,
       });
 
@@ -26,7 +26,7 @@ const generateViewTree = ({
     }
     case "tag": {
       newNode.childNodes = renderNode.internalMetadata.children.map(
-        generateViewTreeHelper
+        generateViewTree
       );
       break;
     }
