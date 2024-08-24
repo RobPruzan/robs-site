@@ -1,3 +1,4 @@
+// @ts-nocheck
 useState();
 useState();
 useEffect();

@@ -1,3 +1,4 @@
+// @ts-nocheck
 const useState = (initialState) => {
   const currentlyRenderingComponent =
     someGlobalObject.currentlyRenderingComponent;

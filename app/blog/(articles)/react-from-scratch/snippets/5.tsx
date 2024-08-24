@@ -1,3 +1,4 @@
+// @ts-nocheck
 export const createElement = <T extends AnyProps>(
   component: ReactComponentExternalMetadata<T>["component"],
   props: T,

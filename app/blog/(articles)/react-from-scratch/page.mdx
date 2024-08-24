@@ -88,19 +88,19 @@ But, if we want to start rendering functional components, and composing differen
 
 Where every function needs to be manually executed to evaluate the rest of the tree.
 
-Another way of saying that is the “children” property in the component's metadata no longer represents a valid tree-like structure we can traverse trivially. We will have to use the HTML tag information, along with the function associated with the component, to generate a full tree we can traverse.
+Another way of saying that is the "children" property in the component's metadata no longer represents a valid tree-like structure we can traverse trivially. We will have to use the HTML tag information, along with the function associated with the component, to generate a full tree we can traverse.
 
 To do this, let's model what a node on this tree we need to build will look like
 
 <SuspenseEditor filePath="./app/blog/(articles)/react-from-scratch/snippets/7.tsx" />
 
-With this kind of tree, we will explicitly have fully executed nodes held inside the “childNodes” property
+With this kind of tree, we will explicitly have fully executed nodes held inside the "childNodes" property
 
 Our next challenge will be to actually generate this view tree given the root components metadata. The root component would be the one passed to
 
 <SuspenseEditor filePath="./app/blog/(articles)/react-from-scratch/snippets/8.tsx" />
 
-In this tree we are trying to make, the parent-child hierarchy is determined by the “children” property on the component's metadata.
+In this tree we are trying to make, the parent-child hierarchy is determined by the "children" property on the component's metadata.
 
 To make a function that can turn the lazy internal metadata into a full view tree, we will need to do the following:
 
@@ -153,7 +153,7 @@ In psuedo code it would look like
 
 <SuspenseEditor filePath="./app/blog/(articles)/react-from-scratch/snippets/14.tsx" />
 
-One way we can use this information is by maintaining an array of “hook state” in our components view node. Where the item in the i'th position belongs to the hook called the i'th time in that component.
+One way we can use this information is by maintaining an array of "hook state" in our components view node. Where the item in the i'th position belongs to the hook called the i'th time in that component.
 
 Because the currently rendering component is accessible globally, we can access its hook array from the `useState` function definition, and then index into it using our global counter. If the hook is running for the first time, we simply push initial state to this array.
 
@@ -218,7 +218,7 @@ We now have 2 tree representations we need to reference to correctly re-render a
 
 To actually build this dependency tree, we need to know in which component a given component was defined. This works because after you call createElement, there's no way to update its props:
 
-- Note, in my actual code on GitHub I refer to the dependency tree as the “RenderTree”
+- Note, in my actual code on GitHub I refer to the dependency tree as the "RenderTree"
 
 <SuspenseEditor filePath="./app/blog/(articles)/react-from-scratch/snippets/18.tsx" />
 
@@ -258,7 +258,7 @@ Previously, to make sure state is not lost between re-renders, we just copied th
 
 But what about every other component? They will all have re-initialized states, remembering nothing from the previous re-render.
 
-This is a pretty hard problem. We only have the runtime representation of what the tree's “look like”. We don't have a compiler that runs over the user's code that tells us which components are equal
+This is a pretty hard problem. We only have the runtime representation of what the tree's "look like". We don't have a compiler that runs over the user's code that tells us which components are equal
 
 What we have to do is determine equality between the 2 trees for every node in the tree, not just the trivial root node.
 
@@ -424,7 +424,7 @@ Drumroll, please.
 
 And because I was curious, I later checked out reacts implementation:
 
-And it was, for the most part, the same implementation as `useMemo`: <Link href="https://github.com/facebook/react/blob/0fa9476b9b9b7e284fb6ebe7e1c46a6a6ae85f27/packages/react-reconciler/src/ReactFiberHooks.js#L2801-L2813">https://github.com/facebook/react/blob/0fa9476b9b9b7e284fb6ebe7e1c46a6a6ae85f27/packages/react-reconciler/src/ReactFiberHooks.js#L2801-L2813</Link>
+And it was, for the most part, <Link href="https://github.com/facebook/react/blob/0fa9476b9b9b7e284fb6ebe7e1c46a6a6ae85f27/packages/react-reconciler/src/ReactFiberHooks.js#L2801-L2813">the same implementation as `useMemo`:</Link>
 
 <h3 id="usecontext">useContext</h3>
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 function updateMemo<T>(
   nextCreate: () => T,
   deps: Array<mixed> | void | null

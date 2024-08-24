@@ -1,3 +1,4 @@
+// @ts-nocheck
 const useRef = (initialState) => {
   const currentlyRenderingComponent =
     someGlobalObject.currentlyRenderingComponent;

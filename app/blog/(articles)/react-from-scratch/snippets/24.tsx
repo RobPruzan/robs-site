@@ -1,3 +1,4 @@
+// @ts-nocheck
 const outputInternalMetadata = internalMetadata.component.function({
   ...renderNode.internalMetadata.props,
   children: internalMetadata.children,

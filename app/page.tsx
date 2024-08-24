@@ -42,7 +42,7 @@ export default function Home() {
         to see what I've written so far.
       </span>
       <span>
-        Most recently, I've been interested in functional programming and real
+        Most recently, I've been interested in UI framework internals and real
         time technologies <span className="text-yellow-500 text-2xl ">⚡</span>
       </span>
       <span className="text-xl w-full text-start">Projects</span>

@@ -1,3 +1,4 @@
+// @ts-nocheck
 export const useCallback = <T,>(
   fn: () => T,
   deps: Array<unknown>

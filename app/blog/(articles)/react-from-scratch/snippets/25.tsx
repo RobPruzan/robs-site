@@ -1,3 +1,4 @@
+// @ts-nocheck
 export const useMemo = (cb: () => void, deps: Array<unknown>) => {
   const useMemoHookOrder = currentHookORder;
   currentHookORder += 1;

@@ -1,3 +1,4 @@
+// @ts-nocheck
 const ComponentA = ({ children }) => {
   const [count, setCount] = useState(0);
   return <div>{children}</div>;

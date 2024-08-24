@@ -1,6 +1,4 @@
-import { createElement } from "react";
-import { ReactComponentInternalMetadata } from "./4";
-
+// @ts-nocheck
 export const createContext = <T,>(initialValue: T) => {
   const contextId = crypto.randomUUID();
 

@@ -1,7 +1,8 @@
+// @ts-nocheck
 return (
 <div>
   <SomeContext.Provider>
-    <SomeComponent>
+    <SomeComponent/>
   </SomeContext.Provider>
   <OtherComponent/>
 </div>

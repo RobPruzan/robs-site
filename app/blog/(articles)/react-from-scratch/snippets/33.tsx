@@ -1,3 +1,4 @@
+// @ts-nocheck
 export const useContext = <T,>(
   context: ReturnType<typeof createContext<T>>
 ) => {

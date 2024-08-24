@@ -1,3 +1,4 @@
+// @ts-nocheck
 export const useEffect = (cb: () => void, deps: Array<unknown>) => {
   const useEffectHookOrder = currentHookORder;
   currentHookORder += 1;

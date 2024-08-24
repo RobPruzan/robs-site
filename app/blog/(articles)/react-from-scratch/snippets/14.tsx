@@ -1,3 +1,4 @@
+// @ts-nocheck
 let currentHookOrder = 0;
 
 const useState = () => {

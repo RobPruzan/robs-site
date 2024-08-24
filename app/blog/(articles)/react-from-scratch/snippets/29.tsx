@@ -1,1 +1,2 @@
-useMemo(() => () => {}), [])
+// @ts-nocheck
+useMemo(() => () => { }, [])

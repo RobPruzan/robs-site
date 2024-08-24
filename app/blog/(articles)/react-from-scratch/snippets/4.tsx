@@ -1,3 +1,4 @@
+// @ts-nocheck
 // what createElement will accept as input
 export type ReactComponentExternalMetadata<T extends AnyProps> = {
   component: keyof HTMLElementTagNameMap | ReactComponentFunction<T>;

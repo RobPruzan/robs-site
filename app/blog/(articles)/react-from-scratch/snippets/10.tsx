@@ -1,3 +1,4 @@
+// @ts-nocheck
 const applyComponentsToDom = (
   viewNode: ReactViewNode,
   parentElement: HTMLElement | null

@@ -1,3 +1,4 @@
+// @ts-nocheck
 return React.createElement(
   "div",
   null,
