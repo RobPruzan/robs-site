@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <>
+      <>
       <span className="text-4xl w-full flex justify-start">Robby Pruzan</span>
       <div className="w-full flex flex-col gap-y-2 justify-center">
         <div className="flex items-end text-sm gap-x-3">
@@ -48,6 +48,11 @@ export default function Home() {
       <span className="text-xl w-full text-start">Projects</span>
       <div className="flex w-full justify-start">
         <div className="grid grid-cols-1 grid-rows-1 sm:grid-cols-2 sm:grid-rows-2 gap-4">
+        <ProjectCard
+            description="React implemented from scratch with 0 dependencies"
+            href="https://github.com/RobPruzan/react-scratch"
+            title="React from scratch"
+          />
           <ProjectCard
             description="A realtime question board, supporting P2P audio streaming, live transcription and multiplayer infinite whiteboards"
             href="https://fireside.ninja"

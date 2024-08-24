@@ -1,0 +1,446 @@
+import { EstimatedReadTime } from "../../../../lib/EstimatedReadTime";
+
+<EstimatedReadTime path="./app/blog/(articles)/ui-kit-as-a-react-developer/page.mdx" />
+
+Ive had the pleasure to recenly work on iOS development, coming from a strong web development background. I think this is probably a
+pretty common progression for most people, as web development is quite a bit easier to get into than iOS development- a single index.html
+vs xcode, simulators, project config, story boards, swiftui, uikit, and so on.
+
+The way I go about learning new UI frameworks, when optimizing for productivity, is mapping concepts/syntax from the current language im learning
+to existing languages I already know. I think this is also a useful practice for new frameworks as well. The goal of this article will be to relate
+ui-kit concepts back to react, and areas where it doesn't make sense to use the same mental model as you would in react
+
+## Rendering something
+
+The first thing you will want to do when first starting most apps is getting something on the screen. In React this is pretty simple- you write a function that returns
+react elements via JSX. You then call this function and place the result somewhere in your component tree, for example:
+
+```tsx
+import React from "react";
+import ReactDOM from "react-dom";
+
+const App = () => {
+  return <SomeComponent />;
+};
+
+const SomeComponent = () => {
+  return <button>Click me!</button>;
+};
+ReactDOM.render(<App />, document.getElementById("root"));
+```
+
+This is very simple because react abstracts away **how** it will end up placing that `button` in `SomeComponent` on the dom. React has a
+complex inner model of how it translates its virtual component heirachy to UI elements. In UIKit you have raw access to the raw view heirachy
+of the application. It also does not provide a special syntax to define hieracys of UI elements, so the code can feel more verbose to accomplish
+what you can in react.
+
+Lets mimic the react example using UIKit
+
+```swift
+import UIKit
+
+// assume the RootView is used as the root view of the iOS application
+
+class RootView: UIViewController {
+  let button = UIButton()
+  override func viewDidLoad(){
+    super.viewDidLoad()
+    button.setTitle("Your Text Here", for: .normal)
+    self.view.addSubview(button)
+  }
+}
+```
+
+React is doing the same thing, adding the button to the view heirachy, we just dont see it happening.
+
+## Reactivity
+
+Reacitivty, in UI, can be defined as your UI updating to reflect changes to your application state. React makes it quite easy to make a reactive application. You define a function
+which takes props (function arguments) and you bind some state to the component via useState. Your component then is just a pure function that outputs JSX, which will be used to
+render items to the dom- component(props, state) -> UI. Anytime a state update is triggered, react will bind the new state to the component and re-run it.
+
+In UIKit, you do not get the luxury of the framework mutating the view hierachy when your application state changes. This is the core difference between declaritve vs imperative
+UI frameworks. The latter you describe what your UI should look like, while the former you describe the steps to generate the UI of your desire.
+
+Lets put this into an example to see how you can make a simple counter in both react and uikit
+
+```tsx
+import React from "react";
+import ReactDOM from "react-dom";
+
+const App = () => {
+  const [count, setCount] = useState(0);
+  return <button onClick={() => setCount(count + 1)}>{count}</button>;
+};
+
+ReactDOM.render(<App />, document.getElementById("root"));
+```
+
+There's only a few lines, but actually a lot going on. And it's good to understand what react is really doing so the translation to UIKit is more obvious.
+
+The first line in `SomeComponent` we define some state via useState. React needs to find a way to associate that **specific** hook call with data it will store
+somewhere inside the framework internals. The way it does that is tracking when the hook was called relative to the component- between when `SomeComponent` was called
+and the next component call, all hook calls will be associated with `SomeComponent`. React also needs to be able to uniquely identify the hook call in the case there
+are multiple useState calls in the component:
+
+```tsx
+const [count, setCount] = useState(0);
+const [count2, setCount2] = useState(0);
+```
+
+Updating count to 1 should not affect count2.
+
+Now moving on to the next line, we define a button that accepts a function, `onClick`, which it will call anytime the click event is triggered. We decide to update the count state
++1 the previous count, and show that count as the button's inner text. When `setCount` is called, we alert react to update the count state, and to re-run the component with that new
+state.
+
+So in order, what happens is:
+
+1. We render App as the root element of the application. All rendering will start from `App`
+2. React will attempt to render the next child, App. Within `App` we immediately make a useState call,
+   passing 0 as the initial state. React will setup an inner representation of the component that can be very roughly translated to:
+
+// UPDATE THIS SO IT INCLUDES FUNCTION AND MENTION CALLING THE FUNCTION AND PASSING PROPS
+
+```ts
+let reactInternals = {
+  components: {
+    "SomeComponent-ChildOf-Root": {
+      state: [0],
+      props: [],
+    },
+  },
+  currentlyRendering: "SomeComponent-ChildOf-Root",
+  numberOfHooksCalledInComponent: 1, // 1 because we just called useState
+};
+```
+
+2. useState returns `reactInternal.components[currentlyRendering][state][numberOfHooksCalledInComponent]`, which ends up being the initial state: 0, and a function that update
+   that state, which can be over simplified as:
+
+```typescript
+(newState) => {
+  reactInternal.components[currentlyRendering][state][
+    numberOfHooksCalledInComponent
+  ] = newState;
+  triggerReRenderOf(currentlyRendering);
+};
+```
+
+3. We return a button that has an eventHandler attached to it (onClick). This means react will:
+
+- Append a `button` element to the dom through its nearest parent (the element with an id of "root")
+- React sets its inner text to the value stored in count
+- React adds an event listener to the button, with the event handler being the anonymous function we created
+
+4. User clicks button
+5. The browser will call the click handler, which in-turn calls setCount(count + 1)
+6. The state gets updated, and react calls your component again with the new internal representation:
+
+```ts
+let reactInternals = {
+  components: {
+    "SomeComponent-ChildOf-Root": {
+      state: [1],
+      props: [],
+    },
+  },
+  currentlyRendering: "SomeComponent-ChildOf-Root",
+  numberOfHooksCalledInComponent: 0, // 0 assuming the component is just about to be re-rendered
+};
+```
+
+7. useState is called, causing us to increment numberOfHOoksCalledInComponent by 1.
+8. useState will return `reactInternal.components[currentlyRendering][state][numberOfHooksCalledInComponent]`, which is now 1
+9. React will re-construct the `button` and determine if it changed from the last time the component rendered.
+10. React will identify its innerText, `{count}`, has been updated to 1, so it will update the buttons innerValue to 1 via the DOM
+
+Now this is a crazy amount of work to have some state in our application that we don't see at all! I completely glossed over reacts complex diffing algorithim
+to determine whether to update the UI when re-rendering components.
+
+Given we now know how react actually handles state and updating the screen, this wont be a big problem to do in UIKit manually.
+
+Let me give an example of how we can reaccomplish what we did in react, mostly, and then I'll go over it.
+
+```swift
+class RootView: UIViewController {
+  let button = UIButton()
+  var count = 0
+  override func viewDidLoad(){
+    super.viewDidLoad()
+    button.setTitle(count, for: .normal)
+    self.view.addSubview(button)
+    self.addTarget(#selector(handleClick), for: .touchUpInside)
+  }
+
+  @objc func handleClick(){
+    self.count += 1
+    button.setTitle(count)
+  }
+}
+```
+
+This looks more complex then the code we had to write for the react example, but is significantly less complicated than the code running in the react internals.
+
+The first thing I'll go over is the new `@objc` attribute I introduced. This is a special swift feature that lets objective-c, the language UIKit is written in, and swift
+to call eachother. We need this because any event handler we set it our button will be called by objective c code, just like how the browser called our click handler.
+
+To add the event handler, we use a special function called #selector, you can think of the output of this function as a way to locate handleClick and be able to call it, since it
+can't just take in the raw swift function.
+
+The line
+
+```swift
+(..., for: .touchUpInside)
+```
+
+is also special swift syntax. If you imagine addTarget is defined as:
+
+```swift
+enum TouchEventType {
+  case touchUpOutside
+  case touchUpInside
+  case touchDownRepeat
+  ...
+}
+func addTarget(..., for: TouchEventType)
+```
+
+Swift can infer we have to be passing one of the enum cases to for when calling `addTarget`. So it does not need you to name the enum when accessing the case, just like how
+in typescript a variable does not need a type defintion to have a type.
+
+So:
+
+```swift
+self.addTarget(#selector(handleClick), for: .touchUpInside)
+
+```
+
+and
+
+```swift
+self.addTarget(#selector(handleClick), for: TouchEventType.touchUpInside)
+
+```
+
+are the same.
+
+Now everything else is syntax should be familiar with, so now lets go over how each piece of logic maps back to what we did in react:
+
+- The state we define, `var count = 0`, can be thought of as manually defining what react does within its internals
+- `handleClick` contains functionality that both mutates state and updates the UI. We can map this directly to what
+  our setCount was doing in react. setCount updated the react-internal true state, and triggered the component to
+  re-run, allowing the innerText of the button to change.
+
+Now this kind of... sucks? In react we can make very large components without having to think about if our UI will be in sync,
+but in the world of UIKit of using this strategy of manually updating the view on every event, it is very likely we will miss
+something and write some bugs.
+
+## Enter Combine
+
+UIKits official solution to this is a reactivity framework called `Combine`. This framework allows us to decouple updating state and updating our UI,
+something that react already allows us to do by only exposing a function that can update state, while not exposing a way to re-render a component (without updating state)
+
+Combine is a very powerful and complex library, so I will only scratch the surface to the point you can be as productive as you were in react. If you want to dive deeper
+I strongly reccomend this [book](tbd)
+
+Combine follows a publisher/subscriber model. This is probably already familiar to you if you have ever used a 3rd party state manager (redux, zustand, jotai, xstate, mobx) or
+reacts native `useContext` feature. The main idea is you have a centralized store for data which can be updated over time. This store accepts functions, aka subscribers,
+that will be called anytime the data in the store changes.
+
+We will manually create a publisher/subscriber store in react to get a good intution of how it works, and then see how UIKit handles this abstraction.
+
+Our main goal will be to have a centralized data store that can alert our app when data changes, allowing the app to re-draw the UI with the latest data.
+
+Lets do this the simplest way possible, an object with the following properties:
+
+- An array of functions that can come from anywhere in the app. We will call every function in the array anytime state changes
+- A function that can handle adding subscribe functions to our subscribers array, and returns a function that allows a subscriber to unsuscribe (incase they no longer want to listen for updates)
+- Some state that will be useful for our app
+- A setter for the state so that we can alert our subscribers everytime the state changes
+- A getter for the state so we can read an initial value of the store before subscribing
+
+```ts
+const store = {
+  subscribers: [],
+  subscribe: (subscriber) => {
+    subscribers.push(subscriber);
+    return () => {
+      this.subscribers = subscribers.filter((sub) => sub !== subscriber);
+    };
+  },
+  _state: 0,
+  set state(value) {
+    this.subscribers.forEach((subscriber) => subscriber(value));
+    this._state = value;
+  },
+  get state() {
+    return this._state;
+  },
+};
+```
+
+This is all we need for a fully functioning publisher/subscriber store that can easily be used in react with the following code:
+
+```typescript
+const App = () => {
+  const [snapshotValue, setSnapshotValue] = useState(store.state);
+  useEffect(() => {
+    const unSubscribe = store.subscribe((newValue) => {
+      setSnapshotValue(newValue);
+    });
+
+    return unSubscribe;
+  }, []);
+  return (
+    <button
+      onClick={() => {
+        store.state += 1;
+      }}
+    >
+      {snapshotValue}
+    </button>
+  );
+};
+```
+
+We initialize state, via useState, for our component. This state is always immediately synced with the store by updating it through a subscriber function. This means
+anytime **anybody** updates the store state, our component will read the latest value and re-render (where react handles re-drawing our UI given our component output).
+
+To update the store, it's trivial. We do what it appears to be just mutating the stores `state` property and incrementing it. Of course we know that we have a custom setter for this
+proprety, but the updater of the state has no need to know this!
+
+Now lets see a simple example of how this is done in combine:
+
+```swift
+import Combine
+import UIkit
+class RootView: UIViewController {
+  let button = UIButton()
+  @Published var count = 0
+  var subscriptions = Set<AnyCancellable>()
+
+  override func viewDidLoad(){
+    super.viewDidLoad()
+    button.setTitle(count, for: .normal)
+    self.view.addSubview(button)
+    self.addTarget(#selector(handleClick), for: .touchUpInside)
+
+    $count.sink { newCount in
+      button.setTitle(newCount)
+    }.store(in: &subscriptions)
+  }
+
+
+  @objc func handleClick(){
+    self.count += 1
+  }
+}
+```
+
+The translation can be done as follows:
+
+- @Published is a property wrapper that enhances `var count`'s functionality so that it sets up a store similar to the one we manually wrote. It also automatically exposes
+  a variable with a $ prendeded to it ($count) which gives us the ability to subscribe to the store it automatically created
+- .sink is equivelent to .subscribe on our custom store
+- .store(in &subscriptions) partly translates to returning an unsuscribe function in our stores .subscribe. The main difference here is that
+  .store(in:) will mutate `subscriptions`, adding an object which must be kept alive for the subscription to stay active. Swift does not have a garbage collector,
+  and instead relies on counting how many references an object has to it. If it has 0, it's deallocated. If we don't store the subscription object reference in a persistant
+  location, our subscription will be automatically cancelled.
+
+Using this publisher/subscriber model we can entirely decouple state updates, and ui updates, just like we would in a react app
+
+## Navigation
+
+In _normal_ react we are running a single page application. That means once our page load the browser next requests a new page. Every change to the screen is handled by javascript that is already
+loaded on the app.
+
+Navigation in most react apps are abstracted away from libraries like react-router or tanstack-router.
+
+Though, the core functionality of a client-side page navigation is pretty simple. It involves taking a normal `<a>` element, and when its clicked
+you prevent the default behavior (the browser requesting a new page from the provided href), manually update the page URL by pushing to the browsers stack
+url state (going backward in the browser is simply popping from this url stack state), and update react state that will hold the current page URL. Your app then can then
+conditionally render different pages based on the react URL state.
+
+The fundamentals of navigating in UIKit are actually pretty similar! The biggest difference is there is no URL string to maintain. There still is a navigation stack, and this is
+core to mobile navigation. Its what powers left swiping your screen to go backwards, all UIKit apps get that for free when using the native navigation stack!
+
+Now, what does the navigation stack look like? Its all managed by a:
+
+`UINavigationController`
+
+instance at the root of your application. This can then be shared across your application.
+
+When you have the instance of UINavigationController available to you, you are able to
+
+```swift
+.pushNavigationController(someViewController, animated: true)
+
+```
+
+And display an entirely new screen.
+
+On big difference between pushing a navigation control and pushing a url is a navigation controller is much more stateful than a string. The navigation stack maintains the pushed view controller
+refernce. Which in turn means the all the state of the view controller remains unchanged. This is quite nice as we have to work pretty hard in react-land to persist state to the URL.
+
+We also have the several different types of built in navigations, like bottom sheets, split views, tabs. It blows our built in react tools out of the water. // remake section it sucks getting lazy
+
+## Positioning elements
+
+This is the next big producitivity hit you will feel moving from react to UIKit. This won't neccesarily be a comparison to react, but to CSS, but I think its an important enough concept
+that it needs to be touched on.
+
+In CSS we have quite a bit of utilities for elegantly positioning children relative to a parent- flex boxes, grids, tables. But fundamentally we just have some rectangles that are positioned
+relative to some other rectangles.
+
+Lets assume we only use flex box on the web (cause what else do you really need) for simplicity in this comparison. If we want to replicate a flexbox in UIKit, we need to know how flexbox operates.
+
+A flex box has 2 core components- a primary axis and secondary axis. The primary axis can be controlled with justify-content- modifers and the secondary axis can be controlled with align-items-
+modifiers. These axis are perpindicular to eachother. The primary axis by default is the horizontal axis, but can be switched to use the horizontal axis using the flex-direction: column modifier.
+
+For example, when we say
+
+```html
+<style>
+  .centered {
+    height: 50px;
+    width: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+</style>
+<div class="centered">
+  <span>Hello World</span>
+</div>
+```
+
+We first:
+
+Define immediate constraints on the div the class is assigned on, it has a height, from top to bottom, of 50 pixels. And a width, from left to right, of 50 pixels. But, this is where constraints
+on the immediate parents positioning ends. 
+
+Display flex defines that we want to use some subset of style properties to position children relative to the current container. 
+
+When we define a container uses display: flex, we implicitly create 2 axis the children will be placed on. 
+
+rahhh i want to explain this visually it would be much better with a set of diagrams, obviously....
+
+
+we can come back to styling lately, will go hard with tldraw
+
+
+
+``` 
+<insert picture here>
+```
+
+## Delegates
+
+
+Delegates have a very simple translation to react. Its the same use-case as passing a function down to a component to handle some behavior. For example, onValueChange for a select box component.
+
+Delegates are objects that implement some functions that are normally seen as "business logic". 
+
+Because UIKit is object oriented we dont have a function that accepts arguments, we have a class that accepts `init` arguments, and will give us back an object that we can mutate. You can pass
+the delegate to the child view through init arguments, or by mutating one of its inner properties and assigning it 

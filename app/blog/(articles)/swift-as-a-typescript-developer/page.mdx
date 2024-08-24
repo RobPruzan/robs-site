@@ -1,0 +1,88 @@
+Ive had the pleasure to recenly work on iOS development, coming from a strong web development background. I think this is probably a
+pretty common progression for most people, as web development is quite a bit easier to get into than iOS development- a single index.html
+vs xcode, simulators, project config, story boards, swiftui, uikit, and so on.
+
+The way I go about learning programming languages when optimizing for productivity is mapping concepts/syntax from the current language im learning
+to existing languages I already know. The goal of this article will be to relate swift concepts to typescript, and point out core differences.
+
+Im going to start with the most basic language features for people who have not yet used swift, but if you already know some swift feel free to skip ahead to #TBD
+
+## Immutability
+
+This will be a very easy thing to relate as typescript and swift have very similar behavior with respect to defining mutable vs immutable variables. In typescript, to define a mutable variable
+you will normally reach for the `let` keyword (omitting var), where let allows you to re-assign data to the variable:
+
+```typescript
+let x = 1;
+x += 1;
+// x = 2
+```
+
+And protect the variable from being re-assigned, you would instead use the ``const` keyword
+
+```typescript
+const x = 1;
+x += 1; // Cannot assign to 'x' because it is a constant.
+```
+
+But this is simply an immutable reference, if an object reference is assigned to the variable you can still dereference and mutate it:
+
+```typescript
+const x = { y: 1 };
+x.y += 1;
+// x.y = 2
+```
+
+The equivelent in swift is var and let respectively:
+
+```swift
+var x = 1
+x += 1
+// x = 2
+```
+
+```swift
+let x = 2
+x += 1 // error: left side of mutating operator isn't mutable: 'x' is a 'let' constant
+```
+
+And swift has the same semantics, the reference is immutable but the underlying object may still be able to be mutated
+
+```swift
+class Foo {
+  var x = 0
+}
+
+let foo = Foo()
+foo.x += 2
+// foo.x = 1
+```
+
+## The Type System
+
+In TypeScript when we define a type alias:
+
+```typescript
+type Foo = { x: 2 };
+```
+
+we don't actually care about the name of the type. That's because it's simply an alias. Foo represents the same type as:
+
+```typescript
+type Bar = {};
+```
+
+All we are about is the actual structure it represents. TypeScript was desinged this
+way (as a structual typesystem) to make it maximally compatible with existing JavaScript, but it also ends up being very pleasant to work with.
+
+The first roadblock you will encounter when learning swift is the lack of this ability. The most similar language feature that is very commonly used in swift is a `protocol`.
+
+Swift protocols look very similar to typescript types at first. You give it a name, and some collection of proerties and methods that must exist for **something** to be assignable to the protocol.
+
+```swift
+protocol Foo {
+  var int
+}
+
+
+```
