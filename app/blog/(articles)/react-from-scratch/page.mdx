@@ -210,13 +210,13 @@ If we say that the possibility of a component accepting props from another compo
 
 <Image src="/react-from-scratch/image-2.png" height="450" width="450" />
 
+> Note, in my actual code on GitHub I refer to the dependency tree as the "RenderTree"
+
 This dependency tree is more inline with how react determines to re-render components. This means we have a bug, as our implementation would re-rerender `ComponentB` when a sibling (in the dependency tree) changed, because it was a child in the view tree.
 
 We now have 2 tree representations we need to reference to correctly re-render a component. One that determines how the DOM should look, and the other that determines when components need to re-render.
 
 To actually build this dependency tree, we need to know in which component a given component was defined. This works because after you call createElement, there's no way to update its props:
-
-- Note, in my actual code on GitHub I refer to the dependency tree as the "RenderTree"
 
 <SuspenseEditor filePath="./app/blog/(articles)/react-from-scratch/snippets/18.tsx" />
 
