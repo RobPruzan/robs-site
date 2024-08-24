@@ -210,7 +210,7 @@ If we say that the possibility of a component accepting props from another compo
 
 <Image src="/react-from-scratch/image-2.png" height="450" width="450" />
 
-This dependency tree is more inline with how react determines to re-render components. This means we have a bug, as our implementation would re-rerender `ComponentB` when a sibling in the dependency changed, because it was a child in the view tree.
+This dependency tree is more inline with how react determines to re-render components. This means we have a bug, as our implementation would re-rerender `ComponentB` when a sibling (in the dependency tree) changed, because it was a child in the view tree.
 
 We now have 2 tree representations we need to reference to correctly re-render a component. One that determines how the DOM should look, and the other that determines when components need to re-render.
 
