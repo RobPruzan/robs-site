@@ -405,7 +405,7 @@ Where `areHookInputs` equal simply does:
 
 This means if your function does more computation than the computation required to perform `deps.length` shallow equals, you're probably better off using `useMemo`.
 
-This was also proven at scale with the react compiler- a compiler that memorizes basically everything. They applied it to the Instagram codebase and saw no increases in memory and huge improvements to to interactivity:
+This was also proven at scale with the react compiler- a compiler that memoizes basically everything. They applied it to the Instagram codebase and saw no increases in memory and huge improvements to to interactivity:
 
 <Image src="/react-from-scratch/image-10.png" height="450" width="450" />
 
