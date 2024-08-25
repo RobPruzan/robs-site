@@ -448,7 +448,7 @@ You might think this means that `SomeComponent` now depends on `SomeContext.Prov
 
 While `SomeComponet` does read data provided by `SomeContext.Provider`, `SomeContext.Provider` simply broadcasts a value, it's not creating react state that can be updated + cause a re-render (there is no setter associated with it).
 
-For the data inside the provider to change, there must be a state change triggered by an ancestor of `SomeContext.Provider` (all the data the provider holds must come from a component it depends on, since it was passed as props). And because `SomeComponent` + `SomeContext.Provider` are siblings (in the dependency tree), they share the same ancestors and will be re-rendered together. Allowing `SomeComponent` to read the newest value broadcasted by `SomeComponent` .
+For the data inside the provider to change, there must be a state change triggered by an ancestor of `SomeContext.Provider` (all the data the provider holds must come from a component it depends on, since it was passed as props). And because `SomeComponent` + `SomeContext.Provider` are siblings (in the dependency tree), they share the same ancestors and will be re-rendered together. Allowing `SomeComponent` to read the newest value broadcasted by `SomeComponent`.
 
 If instead `SomeContext.Provider` broadcasted a value that is not react state; it would simply be static, and there would be no reason to have a dependency on something that will never change.
 
