@@ -1,7 +1,7 @@
 // @ts-nocheck
 export const useMemo = (cb: () => void, deps: Array<unknown>) => {
-  const useMemoHookOrder = currentHookORder;
-  currentHookORder += 1;
+  const useMemoHookOrder = currentHookOrder;
+  currentHookOrder += 1;
 
   if (!currentlyRendering.hasRendered) {
     currentlyRendering.hooks.push({

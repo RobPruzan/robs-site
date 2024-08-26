@@ -2,7 +2,7 @@
 const useRef = (initialState) => {
   const currentlyRenderingComponent =
     someGlobalObject.currentlyRenderingComponent;
-  const useRefHookOrder = currentHookORder;
+  const useRefHookOrder = currentHookOrder;
   currentHookOrder += 1;
   if (!currentlyRenderingComponent.hasRendered) {
     currentlyRenderingComponent.hookState.push(

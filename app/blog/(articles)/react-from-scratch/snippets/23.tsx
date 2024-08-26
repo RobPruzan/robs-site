@@ -1,7 +1,7 @@
 // @ts-nocheck
 export const useEffect = (cb: () => void, deps: Array<unknown>) => {
-  const useEffectHookOrder = currentHookORder;
-  currentHookORder += 1;
+  const useEffectHookOrder = currentHookOrder;
+  currentHookOrder += 1;
 
   if (!currentlyRendering.hasRendered) {
     currentlyRendering.hooks.push({

@@ -2,7 +2,7 @@
 let currentHookOrder = 0;
 
 const useState = () => {
-  let useStateHookOrder = currentHookORder;
+  let useStateHookOrder = currentHookOrder;
   currentHookOrder += 1;
   // do some stuff
 };
