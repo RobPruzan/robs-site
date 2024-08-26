@@ -22,7 +22,6 @@ export const createContext = <T,>(initialValue: T) => {
         return contextId as unknown as ReturnType<typeof createElement>;
       }
       const el = createElement("div", null, ...data.children); // for i have sinned, ideally would of used a fragment
-      console.log(el);
       if (!(el.kind === "real-element")) {
         throw new Error();
       }
