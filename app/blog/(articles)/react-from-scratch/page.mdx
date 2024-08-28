@@ -474,11 +474,13 @@ Lets now look at what the `useContext` implementation would look like since all 
 
 <SuspenseEditor filePath="./app/blog/(articles)/react-from-scratch/snippets/33.tsx" />
 
-Something you may have noticed in our use context implementation is we never incremented the hooks called by one or mutated the render nodes hook array. This is because we read the context data based on an ID that is created outside of the react tree (createContext), and because useContext creates no data that needs to be persisted across renders, it only reads. So we are not limited by the order it was called.
+Something you may have noticed in our `useContext` implementation is we never incremented the hooks called by one or mutated the render nodes hook array. This is because we read the context data based on an ID that is created outside of the react tree (createContext), and because useContext creates no data that needs to be persisted across renders, it only reads. So we are not limited by the order it was called.
 
-This means we can call it conditionally with no problem. This is the same behavior react's new [`use` hook](https://react.dev/reference/react/use) has, which can be used to read context. I imagine the fact it can be called conditioanlly is for a very similar reason.
+This means we can call it conditionally with no problem. This holds true even in normal React- the following is perfectly valid:
 
-Though, I do not know what the limitation behind not being able to call useContext conditionally. Perhaps this was a quirk in the implementation, making `use` closer to their ideal implementation.
+<SuspenseEditor filePath="./app/blog/(articles)/react-from-scratch/snippets/34.tsx" />
+
+And this is the same behavior react's new [`use` hook](https://react.dev/reference/react/use) has, which can be used to read context.
 
 <h2 id="the-final-result">Final result</h2>
 
