@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-      <>
+    <>
       <span className="text-4xl w-full flex justify-start">Robby Pruzan</span>
       <div className="w-full flex flex-col gap-y-2 justify-center">
         <div className="flex items-end text-sm gap-x-3">
@@ -35,7 +35,8 @@ export default function Home() {
       </div>
 
       <span>
-     This website serves as a log of things i've learned and built overtime. Check out the
+        This website serves as a log of things i've learned and built overtime.
+        Check out the
         <Link className="text-blue-500 underline mx-2" href={"/blog"}>
           blog
         </Link>
@@ -48,7 +49,7 @@ export default function Home() {
       <span className="text-xl w-full text-start">Projects</span>
       <div className="flex w-full justify-start">
         <div className="grid grid-cols-1 grid-rows-1 sm:grid-cols-2 sm:grid-rows-2 gap-4">
-        <ProjectCard
+          <ProjectCard
             description="React implemented from scratch with 0 dependencies"
             href="https://github.com/RobPruzan/react-scratch"
             title="React from scratch"
@@ -109,11 +110,11 @@ export default function Home() {
             title="Software Engineering Intern at LanzaTech"
             description="Worked on automatically scoring human label outputs against model outputs. This required a full stack effort in-order to get the scores back to the humans in a meaningful way"
           />
-          <TimelineItem
+          {/* <TimelineItem
             date="Sep 2023 – Present"
             title="Teaching Assistant at University at Buffalo"
             description="Assisted in teaching courses including CSE 312 Web Applications, CSE 250 Data Structures, CSE 116 (x2) Intro to Programming II, and CSE 115 Intro to Programming I."
-          />
+          /> */}
           <TimelineItem
             date="Sep 2022 – May 2023"
             title="Software Engineering Intern at LanzaTech"
