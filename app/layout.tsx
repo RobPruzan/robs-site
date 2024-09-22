@@ -5,11 +5,11 @@ import { AI_AGENT_NOTES, cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ContentNavbar } from "./ContentNavbar";
-
 export const metadata: Metadata = {
   title: "Robby's blog",
   description: `log of things i've learned and built overtime`,
 };
+
 
 export default function RootLayout({
   children,

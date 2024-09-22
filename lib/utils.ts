@@ -25,4 +25,8 @@ export const articleNameMap = {
   "the-react-way-to-think": "the react way to think",
   "ui-kit-as-a-react-developer": "ui kit as a react developer",
   "react-from-scratch": "react from scratch",
+  "null-but-not-null": "null, but also not null",
 };
+
+export const BASE_URL =
+  typeof window !== "undefined" ? location.origin : "https://rob.directory";

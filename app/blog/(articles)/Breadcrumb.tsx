@@ -11,7 +11,7 @@ export const BlogBreadcrumb = () => {
     <div className="flex items-center justify-start">
       {path.length > 0 &&
         path.map((segment, index) => (
-          <div className="flex items-end overflow-x-auto">
+          <div key={index} className="flex items-end overflow-x-auto">
             <ChevronRight />
             <Link
               className={cn([

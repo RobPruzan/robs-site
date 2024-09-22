@@ -1,0 +1,100 @@
+import Image from "next/image";
+import Link from "next/link";
+import { EstimatedReadTime } from "../../../../lib/EstimatedReadTime.tsx";
+
+import { SuspenseEditor } from "../../../../lib/WithCodeTab.tsx";
+
+# null, but also not null
+
+Robby Pruzan 8/23/24
+
+<EstimatedReadTime path="./app/blog/(articles)/null-but-not-null/page.mdx" />
+
+As a followup to <Link href="/blog/a-different-way-to-think-about-typescript">a different way to think about typescript</Link>, I wanted to share a typescript trick
+I've been enjoying (a little too much?) lately.
+
+<SuspenseEditor filePath="./app/blog/(articles)/null-but-not-null/snippets/1.tsx" />
+
+> Note, ! is the <Link href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-0.html#non-null-assertion-operator">non null assertion operator</Link>
+
+Which can be read as: the value null, asserted as not being null. Which sounds like nonsense; why wouldn't this produce an error?
+
+Well, here's something even weirder, this compiles even under strict tsc checks
+
+<SuspenseEditor filePath="./app/blog/(articles)/null-but-not-null/snippets/2.tsx" />
+
+but actually, this works for any type...
+
+<SuspenseEditor filePath="./app/blog/(articles)/null-but-not-null/snippets/3.tsx" />
+
+My first reaction when seeing this was it made no sense, and was an escape hatch built into the compiler. But, after thinking about
+it for a little longer using the mental model described <Link href="/blog/a-different-way-to-think-about-typescript">in the article</Link>, it makes sense.
+
+If we were to infer a type from `null!`, what would it be? Another way to ask that is: what type constructs a set that contains the value `null!`.
+
+Well, no value exists that is both null, and not null. So if nothing exists in this set, let's just say it constructs an empty set.
+
+If types are modeled as the sets they construct, which sets contain the empty set? More formally, for which sets does the condition hold that
+every item in the empty set is in the set we're checking against.
+
+Well, that's every set, right? If the empty set has nothing, then every set has _at least_ nothing.
+
+<Image
+  alt="empty set subset explanation"
+  src="/null-but-not-null/empty-set.png"
+  height="600"
+  width="600"
+/>
+
+That should give a good intuition for why `null!` is assignable to every type in typescript
+
+> Note, the "empty set" type/ the type null! gets inferred as is called `never`. Which you may see frequently as the error branch of
+> conditional types.
+>
+> You may think that this can be problematic because `never` can be assigned to anything. But, the converse
+> is not true. Nothing can be assigned to never (other than the empty set itself).
+>
+> If we tried to assign a value of type number to a value of type never, we would have to check if every value in the set number constructs exists
+> in the empty set, which of course, is not the case.
+
+<Image
+  alt="converse of empty set explanation"
+  src="/null-but-not-null/converse.png"
+  height="600"
+  width="600"
+/>
+
+## Practical use case
+
+Now this is a dangerous assertion, as the following code blows compiles... and blows up at runtime:
+
+<SuspenseEditor filePath="./app/blog/(articles)/null-but-not-null/snippets/4.tsx" />
+
+there are 3 cases I find this to be useful:
+
+- placeholder for a future value
+- debugging (which kinda falls under the previous point)
+  - `functionThatAcceptsComplexRequirements(null!) // now I can immediately see the properties on the returned value`
+- a hacky way to early return when encountering an <Link href="https://softwareengineering.stackexchange.com/questions/32727/what-are-invariants-how-can-they-be-used-and-have-you-ever-used-it-in-your-pro">invariant</Link> error, instead of throwing an error
+
+To explain the latter, the following pattern is common:
+
+<SuspenseEditor filePath="./app/blog/(articles)/null-but-not-null/snippets/5.tsx" />
+
+Depending on how your code is written, this can crash the whole program. Which might be the exact behavior you want,
+but in some cases, it's useful to allow the program to continue executing for debugging purposes.
+
+One solution would be to early return, instead of throwing an error:
+
+<SuspenseEditor filePath="./app/blog/(articles)/null-but-not-null/snippets/6.tsx" />
+
+Though, our function would now return `T | undefined`, where T is the prior return value type.
+
+If, instead, we return null!
+
+<SuspenseEditor filePath="./app/blog/(articles)/null-but-not-null/snippets/7.tsx" />
+
+Our function appears to return `T`, even though there's a branch we early return the value `null`
+
+I still prefer throwing errors in development for invariants, but I like having the optionality to be able to quickly
+swap throw new Error(...) with return null! without messing with types.
