@@ -57,6 +57,8 @@ That should give a good intuition for why `null!` is assignable to every type in
 > If we tried to assign a value of type number to a value of type never, we would have to check if every value in the set number constructs exists
 > in the empty set, which of course, is not the case.
 
+> Note, since the type of null! is never, you can accomplish the same behavior with asserting any value is never, e.g. `"some string" as never`
+
 <Image
   alt="converse of empty set explanation"
   src="/null-but-not-null/converse.png"
