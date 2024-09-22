@@ -80,6 +80,11 @@ export default function Home() {
       <div className="w-full flex flex-wrap gap-2">
         <ol className="relative border-s border-gray-200 dark:border-gray-700">
           <TimelineItem
+            date="Sep 2024 – Present"
+            title="Software Engineer at Million.js"
+            description="React tooling to make websites faster"
+          />
+          <TimelineItem
             date="June 2024 – Aug 2024"
             title="Software Engineering Intern at Walmart"
             description="Core iOS app development for Walmart Pay on the Walmart app"
