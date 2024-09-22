@@ -1,13 +1,22 @@
+"use client";
+
 import { getDirectories } from "@/lib/getDirectories";
-import { articleNameMap, createdAtMap, showArticles } from "@/lib/utils";
-import Image from "next/image";
+import { showArticles, createdAtMap, articleNameMap } from "@/lib/utils";
 import Link from "next/link";
-export default async function Page() {
-  const directoryNames = await getDirectories("./app/blog/(articles)");
+import { usePathname } from "next/navigation";
+
+export const MoreArticles = ({
+  directoryNames,
+}: {
+  directoryNames: Array<string>;
+}) => {
+  const pathname = usePathname();
+  const exclude = pathname.split("/").at(-1)!;
   return (
-    <div className="w-full flex flex-col gap-y-2">
+    <div className="w-full border-t border-muted-foreground">
+      <h2>More articles</h2>
       {directoryNames
-        .filter((name) => showArticles.includes(name))
+        .filter((name) => showArticles.includes(name) && name !== exclude)
         .sort((a, b) => {
           const aDate = createdAtMap[a];
           const bDate = createdAtMap[b];
@@ -21,7 +30,6 @@ export default async function Page() {
                 className="underline underline-offset-4"
                 href={`/blog/${name}`}
               >
-                
                 {articleNameMap[name as keyof typeof articleNameMap] ?? name}
               </Link>
             </div>
@@ -30,4 +38,4 @@ export default async function Page() {
         ))}
     </div>
   );
-}
+};

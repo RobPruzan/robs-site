@@ -30,3 +30,19 @@ export const articleNameMap = {
 
 export const BASE_URL =
   typeof window !== "undefined" ? location.origin : "https://rob.directory";
+
+
+
+ export const showArticles = [
+    "infinite-canvas",
+    "a-different-way-to-think-about-typescript",
+    "react-from-scratch",
+    "null-but-not-null",
+ ];
+  
+ export const createdAtMap: Record<string, Date> = {
+  "infinite-canvas": new Date("2024-06-30"),
+  "a-different-way-to-think-about-typescript": new Date("2024-07-27"),
+  "react-from-scratch": new Date("2024-08-23"),
+  "null-but-not-null": new Date("2024-09-22"),
+};
