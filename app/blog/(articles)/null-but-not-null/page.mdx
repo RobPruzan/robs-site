@@ -101,5 +101,6 @@ If, instead, we return null!
 
 Our function appears to return `T`, even though there's a branch we early return the value `null`
 
-I still prefer throwing errors in development for invariants, but I like having the optionality to be able to quickly
-swap throw new Error(...) with return null! without messing with types.
+Returning something of type never is dangerous and can make your program extremely difficult to debug if you forget about it.
+Use this sparingly, and as a hack to do something quickly. Just like you may temporarily use `any` on a variable to do something quickly,
+if that `any` is left in the codebase, it would suck.
