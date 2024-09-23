@@ -75,8 +75,8 @@ Now this is a dangerous assertion, as the following code blows compiles... and b
 there are 3 cases I find this to be useful:
 
 - placeholder for a future value
-- debugging (which kinda falls under the previous point)
-  - `complexArgs(null!) // now I can immediately see the properties on the returned value`
+- autocomplete debugging (which kinda falls under the previous point)
+  - `takesComplexArgs(null!) // now I can immediately see the properties on the returned value, without having to pass a real value`
 - a hacky way to early return when encountering an <Link href="https://softwareengineering.stackexchange.com/questions/32727/what-are-invariants-how-can-they-be-used-and-have-you-ever-used-it-in-your-pro">invariant</Link> error, instead of throwing an error
 
 > Note, in all cases it would not be reasonable to actually ship `null!` to production. It's only intended to be a quick
