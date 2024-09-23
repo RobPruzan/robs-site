@@ -82,20 +82,32 @@ there are 3 cases I find this to be useful:
 > Note, in all cases it would not be reasonable to actually ship `null!` to production. It's only intended to be a quick
 > way to get around the compiler in some cases
 
-To explain the latter, the following pattern is common:
+To explain the latter, imagine the following case:
+
+I have a function that accepts an argument, which is an array of reverse sorted ints, the best type I can give it is `Array<number>`.
+Should the function operate under the assumption it's working with a `Array<number>` or a reverse sorted array of ints?
+
+If it's a specialized algorithm for operating on a reverse sorted array of ints, assuming its as wide as an array of numbers is out of scope for it (what would it do if it encountered an ascending array of floats?).
+Now the function executes with some conditions the compiler does not know about.
+
+In this function, there may be a branch that the compiler has an overly wide type because it can't confirm the condition we only know about.
+You may throw an error to avoid wasting computation processing that impossible case.
 
 <SuspenseEditor filePath="./app/blog/(articles)/null-but-not-null/snippets/5.tsx" />
 
-Depending on how your code is written, this can crash the whole program. Which might be the exact behavior you want,
-but in some cases, it's useful to allow the program to continue executing for **debugging purposes**.
+But imagine the following:
 
-One solution would be to early return, instead of throwing an error:
+The impossible case happens, and the function (maybe the whole program) immediately stops executing because of the error
+
+But for whatever reason (hunting down a bug maybe), you want to very quickly see what happens if the function executes longer.
+Perhaps the supposed impossible case only gets hit every 1/1000 cases, and you don't care about the failed case for now.
+You're trying to debug something else, and it's getting in the way. You could instead early return, but now the type signature is different.
 
 <SuspenseEditor filePath="./app/blog/(articles)/null-but-not-null/snippets/6.tsx" />
 
-Though, our function would now return `T | undefined`, where T is the prior return value type.
+> returns `T | undefined`, where T is the prior return value type.
 
-If, instead, we return null!
+But, we can use the never type to avoid this type error:
 
 <SuspenseEditor filePath="./app/blog/(articles)/null-but-not-null/snippets/7.tsx" />
 
