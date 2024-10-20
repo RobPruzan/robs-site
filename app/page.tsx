@@ -30,7 +30,7 @@ export default function Home() {
         </div>
         <div className="flex items-end text-sm gap-x-3">
           <Calendar className="text-blue-600" />
-          <span>Age: 20</span>
+          <span>Age: 21</span>
         </div>
       </div>
 
@@ -46,7 +46,7 @@ export default function Home() {
         Most recently, I've been interested in UI framework internals and real
         time technologies <span className="text-yellow-500 text-2xl ">⚡</span>
       </span>
-      <span className="text-xl w-full text-start">Projects</span>
+      <span className="text-2xl w-full text-start underline underline-offset-4">Projects</span>
       <div className="flex w-full justify-start">
         <div className="grid grid-cols-1 grid-rows-1 sm:grid-cols-2 sm:grid-rows-2 gap-4">
           <ProjectCard
@@ -77,7 +77,7 @@ export default function Home() {
         </div>
       </div>
 
-      <span className="text-xl w-full text-start">Experience</span>
+      <span className="text-2xl w-full text-start underline underline-offset-4">Experience</span>
       <div className="w-full flex flex-wrap gap-2">
         <ol className="relative border-s border-gray-200 dark:border-gray-700">
           <TimelineItem
@@ -100,11 +100,7 @@ export default function Home() {
             title="Computer Science Intern at Freddie Mac"
             description="Worked on a jenkins pipeline for automated deployments of a kubernetes based microservice"
           />
-          <TimelineItem
-            date="Sep 2023 – Present"
-            title="Software Engineer at University at Buffalo"
-            description="One of two core engineers on a code-tracing quiz-taking web app used by over 1000 students each semester at the University at Buffalo."
-          />
+       
           <TimelineItem
             date="Sep 2023 – Dec 2023"
             title="Software Engineering Intern at LanzaTech"
@@ -119,6 +115,36 @@ export default function Home() {
             date="Sep 2022 – May 2023"
             title="Software Engineering Intern at LanzaTech"
             description="Core feature development on a react + django website for collecting human labels for a ML pipeline"
+          />
+        </ol>
+      </div>
+      <span className="text-2xl w-full text-start underline underline-offset-4">University/Academia</span>
+      <div className="w-full flex flex-wrap gap-2">
+        <ol className="relative border-s border-gray-200 dark:border-gray-700">
+          <TimelineItem
+            date="Aug 2024 – Present"
+            title="TA (CSE-312, Web Applications)"
+            description=""
+          />
+          <TimelineItem
+            date="Aug 2024 – Present"
+            title="TA (CSE-250, Data Structures)"
+            description=""
+          />
+          <TimelineItem
+            date="Aug 2024 – Present"
+            title="TA (CSE-115, Intro to Programming I)"
+            description=""
+          />
+          <TimelineItem
+            date="Aug 2023 – May 2023"
+            title="TA (CSE-116, Intro to Programming II)"
+            description=""
+          />
+        <TimelineItem
+            date="Sep 2023 – Present"
+            title="Code Tracing Quiz App"
+            description="One of two core maintainers on a code-tracing quiz-taking web app used by over 1000 students each semester at the University at Buffalo."
           />
           <TimelineItem
             date="Feb 2022 – May 2023"
