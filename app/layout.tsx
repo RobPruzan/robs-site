@@ -1,3 +1,4 @@
+import { Monitoring } from "react-scan/monitoring/next";
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
@@ -10,7 +11,6 @@ export const metadata: Metadata = {
   description: `log of things i've learned and built overtime`,
 };
 
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -19,6 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={cn("min-h-screen bg-background antialiased font-mono")}>
+        <Monitoring
+          apiKey="KyyGrMdEBtKLD70b-06JjOOaxolZ2Gll"
+          url="https://monitoring.react-scan.com/api/v1/ingest"
+        />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
