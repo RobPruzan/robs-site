@@ -140,7 +140,7 @@ export function ProjectCard({
               </div>
             </div>
           </DrawerTrigger>
-          <DrawerContent>
+          <DrawerContent className="h-[50vh] mt-auto">
             <div className="mx-auto w-full max-w-lg">
               <DrawerHeader className="space-y-4">
                 <div className="flex items-center justify-between">
