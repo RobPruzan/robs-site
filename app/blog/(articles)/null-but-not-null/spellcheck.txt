@@ -6,7 +6,7 @@ import { SuspenseEditor } from "../../../../lib/WithCodeTab.tsx";
 
 # null, but also not null
 
-Robby Pruzan 8/23/24
+Rob Pruzan 8/23/24
 
 <EstimatedReadTime path="./app/blog/(articles)/null-but-not-null/page.mdx" />
 

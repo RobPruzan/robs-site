@@ -7,7 +7,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "./components/Navbar";
 
 export const metadata: Metadata = {
-  title: "Robby's blog",
+  title: "Rob's blog",
   description: `log of things i've learned and built overtime`,
 };
 
