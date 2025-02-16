@@ -141,7 +141,7 @@ export function ProjectCard({
             </div>
           </DrawerTrigger>
           <DrawerContent className="h-[50vh] mt-auto">
-            <div className="mx-auto w-full max-w-lg">
+            <div className="mx-auto w-full max-w-lg h-full overflow-y-auto">
               <DrawerHeader className="space-y-4">
                 <div className="flex items-center justify-between">
                   <DrawerTitle className="text-xl font-mono text-white/90">
@@ -158,7 +158,7 @@ export function ProjectCard({
                   {longDescription}
                 </p>
               </DrawerHeader>
-              <div className="px-4 pb-8 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+              <div className="px-4 pb-24">
                 {contributions && (
                   <div className="space-y-2">
                     <h4 className="text-white/80 font-mono text-xs">Overview:</h4>
