@@ -21,7 +21,7 @@ export function Navbar() {
               </p>
 
               <p className="text-white/40 font-mono text-sm max-w-xl mt-4">
-                Building performance tooling at Million (YC '24).
+                Building performance tooling at Million (YC '24)
               </p>
             </div>
             <div className="flex items-center gap-6">
