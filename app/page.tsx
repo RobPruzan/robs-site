@@ -206,7 +206,7 @@ export default function Home() {
             The app importantly implements a real time canvas that supports
             image upload, drawing, and embedding the canvas directly into chat
             messages. The specific motivation for the app was to allow
-            professors to visualize drawings with students instead. It also
+            professors to visualize drawings for students directly in the website. It also
             allows students to quickly send hand drawn diagrams when asking
             questions.
           </p>
