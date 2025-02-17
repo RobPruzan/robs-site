@@ -88,7 +88,7 @@ export function ProjectCard({
           <h3 className="text-xl md:text-2xl text-white/95 font-mono mb-2 md:mb-3">
             {title}
           </h3>
-          <p className="text-sm text-white/90 font-mono max-w-[90%] mb-4 md:mb-6">
+          <p className="text-sm text-white/90 font-mono max-w-[90%]">
             {description}
           </p>
         </div>
