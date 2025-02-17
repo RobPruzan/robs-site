@@ -77,7 +77,7 @@ export default function Home() {
       ],
     },
     {
-      title: "Performance Session Replay",
+      title: "Session Replay (for performance problems)",
       description:
         "Visually enhanced session replays, offline app simulations, session replay to mp4 server, replay search engine",
       longDescription:
