@@ -39,7 +39,7 @@ export default function Home() {
       title: "React Scan",
       link: "https://github.com/aidenybai/react-scan",
       size: "medium" as const,
-      description: "Visualize re-renders in your react app",
+      description: "A React Devtools alternative",
       longDescription:
         "A script that hacks into react-internals to provide visualizations of re-renders, a real time component inspector tool, and an always on component render time profiler",
       contributions: (
@@ -77,7 +77,7 @@ export default function Home() {
       ],
     },
     {
-      title: "Session Replay (for performance problems)",
+      title: "Session Replay",
       description:
         "Visually enhanced session replays, offline app simulations, session replay to mp4 server, replay search engine",
       longDescription:
@@ -206,9 +206,9 @@ export default function Home() {
             The app importantly implements a real time canvas that supports
             image upload, drawing, and embedding the canvas directly into chat
             messages. The specific motivation for the app was to allow
-            professors to visualize drawings for students directly in the website. It also
-            allows students to quickly send hand drawn diagrams when asking
-            questions.
+            professors to visualize drawings for students directly in the
+            website. It also allows students to quickly send hand drawn diagrams
+            when asking questions.
           </p>
           <p>
             And of course, real time chat messages, threads, reactions, friend
