@@ -39,7 +39,7 @@ export default function Home() {
       title: "React Scan",
       link: "https://github.com/aidenybai/react-scan",
       size: "medium" as const,
-      description: "A React Devtools alternative",
+      description: "React Devtools, but for performance",
       longDescription:
         "A script that hacks into react-internals to provide visualizations of re-renders, a real time component inspector tool, and an always on component render time profiler",
       contributions: (
