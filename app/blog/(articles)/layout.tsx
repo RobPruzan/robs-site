@@ -10,11 +10,12 @@ export default function ArticleLayout({
 }) {
   return (
     <div className="min-h-screen w-full">
-      <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-8">
-        <div className="flex items-center gap-4 mb-8">
+      <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-8 relative">
+        <div className="flex items-center gap-4 mb-8 absolute top-0">
           <Link
+            
             href="/blog"
-            className="text-white/40 hover:text-white/60 transition-colors"
+            className=""
           >
             <ArrowLeft size={20} />
           </Link>

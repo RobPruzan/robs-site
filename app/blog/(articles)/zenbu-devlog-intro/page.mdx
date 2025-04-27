@@ -1,0 +1,38 @@
+import Link from "next/link";
+
+### Zenbu Devlog #0
+
+I always really liked the concept of devlogs, so I figured I would start writing one for my most recent project- Zenbu.
+
+Zenbu started from me reasoning about what I would want from a (web) development environment. I had been working on [React Scan](https://www.npmjs.com/package/react-scan?activeTab=readme) for some number of months, and before that [Million Lint](https://www.npmjs.com/package/@million/lint), which are devtools for discovering/fixing performance problems in React apps.
+
+One side effect of spending an unreasonable amount of time building a devtool for a niche, is you end up with a hunger for better devtools everywhere. Many devtools I wanted to exist either didn't, they were too much effort to setup, or I have a discovery issue.
+
+My next motivation for Zenbu is spending a good amount of time thinking about AI website builders (v0, lovable, bolt), as I was working at [Million](https://million.dev/), the company who made [Same.dev](https://same.new/).
+
+They never felt quite right, the core workflow for all these sites is:
+
+`ask for change -> model attempts change`
+
+Some of the fancier ones let you select elements to provide context, or they take screenshots for you, but when you run into a bug, you always just feel like an idiot and have to throw a "pls fix broken" to the model a few times.
+
+I have no desire to read the code and help the model debug the actual issue, when I use these platforms, I absolutely do not care about the code. I use them to churn out experiments, which they work fantastic for.
+
+But, I will happily describe the problem as precisely as I can describe it. The best way to describe a running program is not observing the HTML output and typing what you see to the model and what you want fixed. There is almost always a very specific tool you would rather use/is a more information dense representation.
+
+For example, if there is an ugly animation, I want the model to just see a video of the animation! If I hit a bug when using the website, I want to just send a replay of that bug to the model and give it all the data it needs to understand why the program behaved poorly.
+
+Last motivation is I've been using a note taking app called [Obsidian](https://obsidian.md/) for the last few months, and the quality of Obsidian has increased how much I write by 100x. I want this local, fast, extensible feel when building apps with models.
+
+Today if I want to create a new project I need to:
+
+1. go to my terminal
+2. run some starter template CLI
+3. Wait a minute to download all the packages/code
+4. Start the dev server
+5. Wait for it to boot
+6. Open the url.
+
+I would create a lot less notes if it took this much effort to make a markdown file. This friction is everywhere when building apps.
+
+The project is open sourced, you can find it here: <Link href="https://github.com/RobPruzan/zenbu/">https://github.com/RobPruzan/zenbu/</Link>

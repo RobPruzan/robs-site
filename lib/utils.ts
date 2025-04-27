@@ -26,6 +26,7 @@ export const articleNameMap = {
   "ui-kit-as-a-react-developer": "ui kit as a react developer",
   "react-from-scratch": "react from scratch",
   "null-but-not-null": "null, but also not null",
+  "zenbu-devlog-intro": "zenbu devlog intro",
 };
 
 export const BASE_URL =
@@ -36,6 +37,7 @@ export const showArticles = [
   "a-different-way-to-think-about-typescript",
   "react-from-scratch",
   "null-but-not-null",
+  "zenbu-devlog-intro",
 ];
 
 export const createdAtMap: Record<string, Date> = {
@@ -43,4 +45,5 @@ export const createdAtMap: Record<string, Date> = {
   "a-different-way-to-think-about-typescript": new Date("2024-07-27"),
   "react-from-scratch": new Date("2024-08-23"),
   "null-but-not-null": new Date("2024-09-22"),
+  "zenbu-devlog-intro": new Date("2025-04-27"),
 };

@@ -13,8 +13,8 @@ export const MoreArticles = ({
   const pathname = usePathname();
   const exclude = pathname.split("/").at(-1)!;
   return (
-    <div className="w-full border-t border-muted-foreground">
-      <h2>More articles</h2>
+    <div className="w-full border-t border-muted-foreground mt-10 gap-y-3 flex flex-col">
+      <h2 className="mt-2">More articles</h2>
       {directoryNames
         .filter((name) => showArticles.includes(name) && name !== exclude)
         .sort((a, b) => {
