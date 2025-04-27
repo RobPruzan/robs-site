@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     title: "Zenbu Devlog Intro",
     description: "Intro to my new project and why I'm building it",
     type: "article",
-    publishedTime: "2024-09-22",
+    publishedTime: "2025-04-27",
   },
   twitter: {
     card: "summary",
