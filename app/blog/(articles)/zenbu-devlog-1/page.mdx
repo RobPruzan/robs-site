@@ -150,7 +150,7 @@ A lot of effort to get hot reloading working, but it would be awful without it.
 
 The devtools script is a little interesting right now, even though I haven't implemented many devtools yet.
 
-One cool bit is how screenshots are implemented. I don't want to ask the user for permission every time I want to take a screenshot cause that would be super annoying, so I need to derive the screenshot from the HTML itself instead of relying on browser API's. For this I'm using [modern screenshot](https://github.com/qq15725/modern-screenshot)
+One cool bit is how screenshots are implemented. I don't want to ask the user for permission every time I want to take a screenshot cause that would be super annoying, so I need to derive the screenshot from the DOM itself instead of relying on browser API's. For this I'm using [modern screenshot](https://github.com/qq15725/modern-screenshot)
 
 But, I have this other feature (as seen in the demo video) where the user can overlay a canvas over the page and draw. I don't want to create any UI inside the actual iframe, I want all the visualizations running in the main app. A problem arises, the screenshot I take of the dom will not include the tldraw drawing.
 
