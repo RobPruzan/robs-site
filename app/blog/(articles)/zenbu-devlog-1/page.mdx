@@ -106,7 +106,9 @@ This is useful for my agent for a pretty simple reason, I'm implementing some co
 
 ### Daemon
 
-I think about the daemon as a local serverless runtime. Traditional serverless runtimes run in the cloud as a way to run stateless functions (like serving the HTML, JS & CSS of a website). They spin up compute for you on demand, nearly instantly. They keep compute for you prewarmed so it doesn't need to cold start to run your function. They handle scaling down the amount of compute you're using if you don't need it.
+I think about the daemon as a local serverless runtime. 
+
+Traditional serverless runtimes run in the cloud as a way to run stateless functions (like serving the HTML, JS & CSS of a website). They spin up compute for you on demand, nearly instantly. They keep compute for you prewarmed so it doesn't need to cold start to run your function. They handle scaling down the amount of compute you're using if you don't need it.
 
 This is everything I need in Zenbu to allow users to create expensive dev servers as fast as creating a markdown file. All the considerations you may have when building a cloud based serverless runtime, Zenbu has, but all the resources being used are local.
 
