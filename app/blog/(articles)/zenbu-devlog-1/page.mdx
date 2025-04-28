@@ -54,7 +54,9 @@ Every service has a distinct reason for existing:
   - Since the dev server's are are all on different origins from the app, I can't do anything (like run code) in the child iframe without iframe.postMessage and window.parent.postMessage.
   - The devtools script is what will enable me to actually have data to build all the devtools I want
 
-I also want to keep this decently modular for when I introduce a plugin system. Isolation through explicit services is not required, but forces me to generate API's/boundaries, which I'll need to do anyways to support plugins.
+I also want to keep this decently modular for when I introduce a plugin system. 
+
+Isolation through explicit services is not required, but forces me to generate API's/boundaries, which I'll need to do anyways to support plugins.
 
 Now going into specifics for each service:
 
