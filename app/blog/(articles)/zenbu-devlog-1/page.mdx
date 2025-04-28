@@ -78,7 +78,7 @@ This is the WebSocket server that bridges the zenbu app to the local filesystem/
 
 If the goal is to just read/write to a directory through the website, then this server could be 50 lines of code. The complexity comes from actually building a reliable agent that does what I want it to do.
 
-Agents are actually pretty easy to build when you don't have any infrastructure constraints (the project and agent are running on the same device), but there are an unbelievable amount of ways an agent can fail. That's why I decided to use Effect here (and everywhere else around this project).
+Agents are pretty easy to build when you don't have any infrastructure constraints (the project and agent are running on the same device), but there are an unbelievable amount of ways an agent can fail. That's why I decided to use Effect here (and everywhere else around this project).
 
 Effect is a lovely typescript library that gives you everything you wished typescript had, and primitives for building robust distributed apps.
 
