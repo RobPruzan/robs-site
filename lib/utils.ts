@@ -27,6 +27,7 @@ export const articleNameMap = {
   "react-from-scratch": "react from scratch",
   "null-but-not-null": "null, but also not null",
   "zenbu-devlog-intro": "zenbu devlog intro",
+  "zenbu-devlog-1": "zenbu devlog #1",
 };
 
 export const BASE_URL =
@@ -38,6 +39,7 @@ export const showArticles = [
   "react-from-scratch",
   "null-but-not-null",
   "zenbu-devlog-intro",
+  "zenbu-devlog-1",
 ];
 
 export const createdAtMap: Record<string, Date> = {
@@ -46,4 +48,5 @@ export const createdAtMap: Record<string, Date> = {
   "react-from-scratch": new Date("2024-08-23"),
   "null-but-not-null": new Date("2024-09-22"),
   "zenbu-devlog-intro": new Date("2025-04-27"),
+  "zenbu-devlog-1": new Date("2025-04-27"),
 };

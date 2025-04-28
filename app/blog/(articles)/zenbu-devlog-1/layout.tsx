@@ -1,3 +1,5 @@
+
+
 import type { Metadata } from "next";
 
 const title = "Zenbu Devlog #1";

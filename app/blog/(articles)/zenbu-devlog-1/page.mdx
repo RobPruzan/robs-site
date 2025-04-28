@@ -1,38 +1,168 @@
 import Link from "next/link";
+import Image from "next/image";
 
-### Zenbu Devlog #0
+### Zenbu Devlog #1
 
-I always really liked the concept of devlogs, so I figured I would start writing one for my most recent project- Zenbu.
+I've been working on the project for about 1.5mo, so good to snapshot the state of progress before I write any new updates
 
-Zenbu started from me reasoning about what I would want from a (web) development environment. I had been working on [React Scan](https://www.npmjs.com/package/react-scan?activeTab=readme) for some number of months, and before that [Million Lint](https://www.npmjs.com/package/@million/lint), which are devtools for discovering/fixing performance problems in React apps.
+Currently, the project is the earliest version you can probably do something useful in it.
 
-One side effect of spending an unreasonable amount of time building a devtool for a niche, is you end up with a hunger for better devtools everywhere. Many devtools I wanted to exist either didn't, they were too much effort to setup, or I have a discovery issue.
+Here's a broken demo (2x speed), and the commit the project was at when this was posted
 
-My next motivation for Zenbu is spending a good amount of time thinking about AI website builders (v0, lovable, bolt), as I was working at [Million](https://million.dev/), the company who made [Same.dev](https://same.new/).
+<Image src="/devlog/demo.gif" height={307} width={500} alt="zenbu demo gif" />
+<div className="underline">
+  <Link href="https://github.com/RobPruzan/zenbu/commit/c5fb2c789bfab4e19c0838f0812cbd31707aa8f2">
+    The commit
+  </Link>
+</div>
 
-They never felt quite right, the core workflow for all these sites is:
+There are quit a bit of moving parts to make all this happen:
 
-`ask for change -> model attempts change`
+- the app
+  - website in the demo video
+- the device bridge
+  - a websocket server running on my computer that lets app interact with my operating system/file system
+- the daemon
+  - this is the process that creates new dev servers
+  - it manages all active dev servers
+  - tries to prewarm servers you may create so starting a project is instant
+  - all happens locally on your computer
+- devtool script
+  - a script injected into the iframe of the agent's website
+  - how the app communicates with the website the agent is making
 
-Some of the fancier ones let you select elements to provide context, or they take screenshots for you, but when you run into a bug, you always just feel like an idiot and have to throw a "pls fix broken" to the model a few times.
+Visually this looks like:
 
-I have no desire to read the code and help the model debug the actual issue, when I use these platforms, I absolutely do not care about the code. I use them to churn out experiments, which they work fantastic for.
+<Image
+  src="/devlog/arch.png"
+  height={430}
+  width={500}
+  alt="zenbu current architecture"
+/>
 
-But, I will happily describe the problem as precisely as I can describe it. The best way to describe a running program is not observing the HTML output and typing what you see to the model and what you want fixed. There is almost always a very specific tool you would rather use/is a more information dense representation.
+> this is exactly how the current system is architected when this log is posted
 
-For example, if there is an ugly animation, I want the model to just see a video of the animation! If I hit a bug when using the website, I want to just send a replay of that bug to the model and give it all the data it needs to understand why the program behaved poorly.
+Every service has a distinct reason for existing:
 
-Last motivation is I've been using a note taking app called [Obsidian](https://obsidian.md/) for the last few months, and the quality of Obsidian has increased how much I write by 100x. I want this local, fast, extensible feel when building apps with models.
+- zenbu app
+  - I want this to be a website, not a local app
+- device bridge
+  - I need some way to read/write the code on the users computer from the website
+- daemon
+  - I need a robust system for managing the life cycles of all the servers the app makes
+- devtools script
+  - Since the dev server's are are all on different origins from the app, I can't do anything (like run code) in the child iframe without iframe.postMessage and window.parent.postMessage.
+  - The devtools script is what will enable me to actually have data to build all the devtools I want
 
-Today if I want to create a new project I need to:
+I also want to keep this decently modular for when I introduce a plugin system. Isolation through explicit services is not required, but forces me to generate API's/boundaries, which I'll need to do anyways to support plugins.
 
-1. go to my terminal
-2. run some starter template CLI
-3. Wait a minute to download all the packages/code
-4. Start the dev server
-5. Wait for it to boot
-6. Open the url.
+Now going into specifics for each service:
 
-I would create a lot less notes if it took this much effort to make a markdown file. This friction is everywhere when building apps.
+### Zenbu app
 
-The project is open sourced, you can find it here: <Link href="https://github.com/RobPruzan/zenbu/">https://github.com/RobPruzan/zenbu/</Link>
+My go to for making web apps is next.js, TRPC, and drizzle. I won't really be using many next.js features here, so what's most interesting is TRPC.
+
+The most important TRPC feature is the glue it provides between your frontend/backend. You define all your endpoints through TRPC, and then interact with them through a type safe RPC on the client.
+
+All the RPC's by default have tanstack query hooks implemented for them, so once you write an endpoint, you automatically have a type safe query/mutation.
+
+And if you take it one step further and define your database schema in typescript (drizzle) you can provide end to end type safety- from your database schema, to your frontend.
+
+I plan on having a local sqlite instance for any app related storage (preferences etc), but the true storage for this app will be a simple KV store (Redis).
+
+I want all core functionality to be implemented as a plugin at some point, and plugins absolutely should not have to define tables in a relational database for storage. I could of course make an abstraction on top of sqlite to let the plugins store data in sqlite without having to actually define that table, but i'd end up just making a K/V store API.
+
+### Device bridge
+
+This is the WebSocket server that bridges that app to the local device. This is where the plugin's that defines "agents" will live.
+
+If the goal is to just read/write to a directory through the website, then this server could be 50 lines of code. The complexity comes from actually building a reliable agent that does what I want it to do.
+
+Agents are actually pretty easy to build when you don't have any infrastructure constraints (the project and agent are running on the same device), but there are an unbelievable amount of ways an agent can fail. That's why I decided to use Effect here (and everywhere else around this project).
+
+Effect is a lovely typescript library that gives you everything you wished typescript had, and primitives for building robust distributed apps.
+
+The 2 most impactful features Effect gave me when making the first real agent for Zenbu was automatically typed errors and a very good dependency injection system.
+
+Typed errors are obviously a win (I know exactly how every function can fail before calling it), but the dependency injection sounds less useful, as you normally hear about it in the context of testing.
+
+Instead of referencing some global service/function, make it a parameter to the function, so you can switch implementations. This normally sucks to do because you need to drill this service through several layers of function calls as an argument.
+
+In React, this is a bit easier. You can use Context to define a dependency to some data higher in the "tree" without having to explicitly pass it as a parameter to the component.
+
+The biggest flaw with React Context (not react's fault, it's a limitation of TS) is that if you use a component outside of its context boundary, it will either throw an error, or reference the default data provided to the context (which is useless data 100% of the time)
+
+I always really wanted React context, just for my server side code. I want to define some data dependency in my call stack, and automatically read from it, without drilling down arguments through the call stack.
+
+React can achieve this because they simulate their own call stack- they call it a "Fiber" tree. The execution of a component is not handled by the javascript engine, but internally by react. When you call useContext in a react component, you are creating a dependency to data somewhere higher in the call stack. To get the data provided by this "higher function", react traverses up its ancestors till it finds the context.
+
+Effect's unit of execution (somewhat confusingly, called an "Effect"), like React components, are also fibers. The execution is managed by the Effect library, so they can implement the same API.
+
+But, Effect solves the "calling a function without its dependencies and it errors" problem. An Effect (the function you write) automatically has all the dependencies it has in the type signature. This means you cannot run the effect without providing the dependency (you will get a type error).
+
+They can do this because of how function generators work in TypeScript, you should read the [effect docs](https://effect.website/) if you're interested in how this works
+
+This is useful for my agent for a pretty simple reason, I'm implementing some complex tools that share a lot of data in unusual ways. The first system I built without effect was quite difficult to reason about and iterate on. Context (and typed errors) reduced the complexity to just the essence of the problem.
+
+### Daemon
+
+I think about the daemon as a local serverless runtime. Traditional serverless runtimes run in the cloud as a way to run stateless functions (like serving the HTML, JS & CSS of a website). They spin up compute for you on demand, nearly instantly. They keep compute for you prewarmed so it doesn't need to cold start to run your function. They handle scaling down the amount of compute you're using if you don't need it.
+
+This is everything I need in Zenbu to allow users to create expensive dev servers as fast as creating a markdown file. All the considerations you may have when building a cloud based serverless runtime, Zenbu has, but all the resources being used are local.
+
+The core is about 80% finished, I haven't actually implemented prewarming or automatic shutdown of servers, but the basics like creating, starting, stopping servers is all there. And of course, it's all built in Effect
+
+The daemon has a simple HTTP server as an interface for the runtime. The reason it's an http sever, even though all these services are running directly on the users computer, is that I may want to create a managed service in the cloud so that you don't need to run these projects on your computer. I don't want services to interact via IPC unless I know they will always be on the same machine.
+
+### Devtools script
+
+Reminder, this script is what allows us to communicate between the iframe (website being developed) and the real app.
+
+I wanted to make sure the DX for this script was on point before writing any code for it.
+
+The simplest way to embed this script into the iframe is to inline a script tag with javascript that does what I want. 
+
+The experience writing that code would be awful, it would be all in an html string, it would be javascript (ew), and I would have to install libraries through cdn's
+
+What I really want is to use typescript, install libraries via npm, and have the output bundled into a single javascript file that I can load into the iframe.
+
+Luckily JS library distributors had to solve this problem, so there are tools like tsup to solve it.
+
+So step one is having a tiny dev server that serves a little JS file bundled by tsup. After getting this setup, I could write typescript and install any libraries I pleased. tsup handles creating that big ugly javascript string that I need to load into my iframe
+
+The next problem is that when I actually change the devtool script code, how do I setup hot reloading? `tsup --watch` is not enough, since the environment that the code is actually running in needs to be alerted to get the latest devtool script.
+
+The data flow looks something like:
+
+- I write code in my file
+- it needs to get compiled and bundled
+- I overwrite the previous bundle, so my server that serves the bundle will automatically point to latest
+- the devtool script is inside an iframe, and the iframe is inside the app
+- I need some way to reload the iframe when the devtools script changes
+
+The way I decided to solve this was to abuse how fast refresh works in next.js, and anytime the devtool script changed, I changed a variable (by writing to a file) that holds a random number within the Next.js app. Anytime that variable changes, I run a function that reloads the iframe on the page.
+
+A lot of effort to get hot reloading working, but it would be awful without it.
+
+The devtools script is a little interesting right now, even though I haven't implemented many devtools yet.
+
+One cool bit is how screenshots are implemented. I don't want to ask the user for permission every time I want to take a screenshot cause that would be super annoying, so I need to derive the screenshot from the HTML itself instead of relying on browser API's. For this I'm using [modern screenshot](https://github.com/qq15725/modern-screenshot)
+
+But, I have this other feature (as seen in the demo video) where the user can overlay a canvas over the page and draw. I don't want to create any UI inside the actual iframe, I want all the visualizations running in the main app. A problem arises, the screenshot I take of the dom will not include the tldraw drawing.
+
+But, I did something clever- when the user takes a screenshot of an area, I take 2 screenshots. One of the tldraw drawing (as a png), and one of the users dom. I then overlay the 2 screenshots into one image. It was a little tricky to get working.
+
+<Image
+  src="/devlog/ss.png"
+  height={430}
+  width={500}
+  alt="zenbu screenshot functionality"
+/>
+
+### Whats next
+
+This is a decent snapshot of current project.
+
+The current UX on the app isn't too interesting to talk about yet since it's all just prototype UI that I will throw away in the future when I figure out the best way to manage windows/projects. The UX will most likely end up feeling like obsidian.
+
+Next goal is to build out an automatic replay system to provide to the agent as context. I already built out the [infra for this system when working on React Scan](https://x.com/RobKnight__/status/1899750190975750591), so hopefully wont take longer than a couple days
