@@ -2,7 +2,7 @@
 
 import type { Metadata } from "next";
 
-const title = "Zenbu Devlog #1";
+const title = "Zenbu Devlog #3";
 const description = "Where we are on progress";
 
 export const metadata: Metadata = {
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title,
     description,
     type: "article",
-    publishedTime: "2024-04-27",
+    publishedTime: "2025-04-28",
   },
   twitter: {
     card: "summary",

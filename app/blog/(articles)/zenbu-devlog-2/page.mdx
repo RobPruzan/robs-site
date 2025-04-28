@@ -1,0 +1,54 @@
+import Link from "next/link";
+import Image from "next/image";
+
+### Zenbu Devlog #2
+
+One feature I really want when working with a model is for it to just see what I'm doing, and know what went wrong after I run into a bug.
+
+Openai had demo'd a feature kind of like this during the release of 4o, where you can live screenshare in the chatgpt native app. 
+
+Unfortunately I still don't have access to this feature. But, I don't think I'd really use what was demo'd.
+
+I don't want the model to always see what I'm doing, I want the model to see a replay of what just went wrong automatically. I also want this to be a feature of an agent that can write directly to files on my computer- so I can show it a bug, and it just fixes it with 0 other input.
+
+This is what I'm working on right now for zenbu. I had already implemented a simple feature where you can record a video of your screen using the native `getDeviceMedia` api on the browser which gives you a video stream of the users screen. Then you can send the video through the chat if the model supports it.
+
+What I need here is for zenbu to always be recording the screen, not just selectively recording when the user wants to. If zenbu isn't always recording, the user can't tell a model to watch a replay of what happened. The user would need to reproduce the bug while recording, and then send that recording (which sucks) 
+
+The simple option would to be always record using the `getDeviceMedia` api. But, this requires user permission every time you start sharing, meaning if you refresh the page you need to accept every time. It also means if you have a mac the little green dot in the notch will always be lit. There are a million things that suck about this approach
+
+The harder option would be to record the screen the same way session replay systems record screens- snapshotting the dom and subsequent mutations, and then replaying them when someone wants to watch the video.
+
+This doesn't require any permissions, and looks like normal javascript. The problem is that these session replay systems have no way of generating anything that looks like an mp4. The representation is an array of instructions to mutate a dom at some timestamp. Models can definitely not understand this, so we need some way to convert the encoding.
+
+The only reliable way to get the mp4 is to replay the session on a real browser, and then record the browser itself.
+
+We can't use the users browser (since I don't want to ask for permission), so we need to replay and record the session on a browser that has relaxed permissions. Browser automation tools like puppeteer solve this, since they are chromium forks with configuration/changes that allow developers to do things like recording the screen without any user confirmation. They also don't need a window to run, which is called headless mode.
+
+So now the solution is:
+1. collect the sequence of dom mutations
+2. replay them on the headless browser
+3. record the browser (actually... just screenshot it at 15FPS)
+4. convert the sequence of PNG's into an MP4
+5. send it back to my server
+
+The reason we are screenshotting is that I couldn't find any API's to get a video stream of the screen from puppeteer. It does seem like it's possible if you use the chrome devtools protocol, but it doesn't make a big difference to me since current models can't really tell the difference between 15FPS (rough max of screenshots per second possible) vs 30-60FPS
+
+The problem with this approach is that we must replay the whole session to get back the mp4. If we have a 5 minute video, it will take 5 minutes to generate the mp4. We can maybe 2-3x the speed of the replay, and take a hit on FPS, but the linear scaling property is a deal breaker.
+
+We can be a bit clever though, instead of turning it into an mp4 once we have the entire session replay, we can preemptively generate the mp4 live. 
+
+How this can work is once the user opens up the zenbu website, we open up an associated puppeteer browser. Every time the user interacts with the real website, we send the session replay event to the puppeteer browser. We end up creating a "mirror tab" that looks exactly like what's on the users browser, just in puppeteer.
+
+Then, as the events get replayed on the puppeteer browser we start taking screenshots. 
+
+By the time the user finally wants to send the replay to the model, there will never be any more session replay events to send to puppeteer. So we will have all the screenshot png's we need to generate the mp4 we need immedietely. 
+
+This gets a little tricky when you start to consider the user may open multiple tabs of zenbu. For every tab of zenbu opened, a mirrored tab in the headless browser needs to be opened. The challenge is that you need to make sure you always properly close the fake tab when the user closes the real tab.
+
+If you rely on ping ponging the real tab to see if it's still alive, you may accidentally close a tab that's really open, because tab backgrounding. 
+
+I don't know if there's a reliable way to determine if a tab is truly still opened, so I'll probably aggressively close tabs when there's long inactivity, and then just restore them if they become active again
+
+It also turns out there's a [live mode](https://github.com/rrweb-io/rrweb/blob/master/docs/recipes/live-mode.md) in the rrweb package (very popular session replay library), which is very convenient 
+

@@ -19,10 +19,10 @@ export default function RootLayout({
   return (
       <html lang="en">
         <body className={cn("min-h-screen bg-gradient-to-b from-[#0A0A0B] via-black to-[#0A0A0B] antialiased font-mono")}>
-          <Monitoring
+          {/* <Monitoring
             apiKey="KyyGrMdEBtKLD70b-06JjOOaxolZ2Gll"
             url="https://monitoring.react-scan.com/api/v1/ingest"
-          />
+          /> */}
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
