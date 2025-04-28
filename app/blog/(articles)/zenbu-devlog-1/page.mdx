@@ -96,7 +96,7 @@ I always really wanted React context, just for my server side code. I want to de
 
 React can achieve this because they simulate their own call stack- they call it a "Fiber" tree. The execution of a component is not handled by the javascript engine, but internally by react. When you call useContext in a react component, you are creating a dependency to data somewhere higher in the call stack. To get the data provided by this "higher function", react traverses up its ancestors till it finds the context.
 
-Effect's unit of execution (somewhat confusingly, called an "Effect"), like React components, are also fibers. The execution is managed by the Effect library, so they can implement the same API.
+Effect's unit of execution, like React components, are also fibers. The execution is managed by the Effect library, so they can implement the same API.
 
 But, Effect solves the "calling a function without its dependencies and it errors" problem. An Effect (the function you write) automatically has all the dependencies it has in the type signature. This means you cannot run the effect without providing the dependency (you will get a type error).
 
