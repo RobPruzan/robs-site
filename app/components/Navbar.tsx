@@ -3,9 +3,17 @@
 import { Github, Linkedin, Twitter } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { isDevlog } from "@/lib/utils";
 
 export function Navbar() {
   const pathname = usePathname();
+
+  // Check if current path is a devlog article
+  const isDevlogArticle =
+    pathname.startsWith("/blog/") &&
+    Object.keys(isDevlog).some(
+      (slug) => pathname === `/blog/${slug}` && isDevlog[slug]
+    );
 
   return (
     <div className="w-full">
@@ -35,7 +43,7 @@ export function Navbar() {
                 <Link
                   href="/blog"
                   className={`text-sm font-mono ${
-                    pathname.startsWith("/blog")
+                    pathname.startsWith("/blog") && !isDevlogArticle
                       ? "text-white/90"
                       : "text-white/60 hover:text-white/80"
                   }`}
@@ -45,7 +53,7 @@ export function Navbar() {
                 <Link
                   href="/zenbu-devlog"
                   className={`text-sm font-mono ${
-                    pathname.startsWith("/zenbu-devlog")
+                    pathname.startsWith("/zenbu-devlog") || isDevlogArticle
                       ? "text-white/90"
                       : "text-white/60 hover:text-white/80"
                   }`}
