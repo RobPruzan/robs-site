@@ -1,7 +1,6 @@
-import { ArrowLeft } from "lucide-react";
 import { MoreArticles } from "@/components/more-articles";
 import { MoreArticlesWithURLPath } from "./last-url-path";
-import Link from "next/link";
+import { BackButton } from "./BackButton";
 
 export default function ArticleLayout({
   children,
@@ -11,15 +10,7 @@ export default function ArticleLayout({
   return (
     <div className="min-h-screen w-full">
       <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-8 relative">
-        <div className="flex items-center gap-4 mb-8 absolute top-0">
-          <Link
-            
-            href="/blog"
-            className=""
-          >
-            <ArrowLeft size={20} />
-          </Link>
-        </div>
+        <BackButton />
 
         <article
           className="mx-auto prose prose-invert 
