@@ -32,6 +32,14 @@ export const articleNameMap = {
   "zenbu-devlog-3": "zenbu devlog #3",
 };
 
+// so bad lol
+export const isDevlog: Record<string, boolean> = {
+  "zenbu-devlog-intro": true,
+  "zenbu-devlog-1": true,
+  "zenbu-devlog-2": true,
+  "zenbu-devlog-3": true,
+};
+
 export const BASE_URL =
   typeof window !== "undefined" ? location.origin : "https://rob.directory";
 

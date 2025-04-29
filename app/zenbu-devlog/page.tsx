@@ -5,13 +5,13 @@ import {
   isDevlog,
   showArticles,
 } from "@/lib/utils";
-import { BlogList } from "./BlogList";
+import { BlogList } from "../blog/BlogList";
 
-export default async function Page() {
+export default async function ZenbuDevlogPage() {
   const directoryNames = await getDirectories("./app/blog/(articles)");
 
   const articles = directoryNames
-    .filter((name) => showArticles.includes(name) && !isDevlog[name])
+    .filter((name) => showArticles.includes(name) && isDevlog[name])
     .sort((a, b) => {
       const aDate = createdAtMap[a];
       const bDate = createdAtMap[b];
@@ -21,7 +21,7 @@ export default async function Page() {
       name,
       title: articleNameMap[name as keyof typeof articleNameMap],
       date: createdAtMap[name],
-      isZenbuDevlog: false,
+      isZenbuDevlog: true,
     }));
 
   return <BlogList articles={articles} />;

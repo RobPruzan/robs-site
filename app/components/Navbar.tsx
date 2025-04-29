@@ -42,6 +42,16 @@ export function Navbar() {
                 >
                   Blog
                 </Link>
+                <Link
+                  href="/zenbu-devlog"
+                  className={`text-sm font-mono ${
+                    pathname.startsWith("/zenbu-devlog")
+                      ? "text-white/90"
+                      : "text-white/60 hover:text-white/80"
+                  }`}
+                >
+                  Zenbu Devlog
+                </Link>
               </nav>
               <div className="flex gap-4 items-center">
                 <a

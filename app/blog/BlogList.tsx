@@ -6,6 +6,7 @@ interface Article {
   name: string;
   title: string;
   date: Date;
+  isZenbuDevlog: boolean
 }
 
 interface BlogListProps {
