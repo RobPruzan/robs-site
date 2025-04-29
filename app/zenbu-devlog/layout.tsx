@@ -2,15 +2,15 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Zenbu Devlog",
-  description: "Development logs for the Zenbu project",
+  description: "devlogs about zenbu",
   openGraph: {
     title: "Zenbu Devlog",
-    description: "Development logs for the Zenbu project",
+    description: "devlogs about zenbu",
   },
   twitter: {
     card: "summary",
     title: "Zenbu Devlog",
-    description: "Development logs for the Zenbu project",
+    description: "devlogs about zenbu",
   },
 };
 
@@ -20,4 +20,4 @@ export default function ZenbuDevlogLayout({
   children: React.ReactNode;
 }) {
   return children;
-} 
+}
