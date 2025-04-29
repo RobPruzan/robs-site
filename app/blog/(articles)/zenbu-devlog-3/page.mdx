@@ -1,0 +1,107 @@
+import Link from "next/link";
+import Image from "next/image";
+
+### Zenbu Devlog #3
+
+A core feature of zenbu will be the ability to write plugins for it.
+
+A good plugin system is the difference between a bloated app that's not great for anyone, to a well scoped platform that can be for everyone.
+
+The best software we have today owe a lot of their success to extensibility:
+
+- vscode
+- obsidian
+- neovim
+- shopify
+- minecraft
+- many more
+
+One of my favorite properties of extensible systems is that you can build really niche features without bloating the core experience.
+
+I saw a tweet I liked a lot from dax the other day that related to this idea:
+
+<Link href="https://x.com/thdxr/status/1916519912043917334">
+    @thdxr 
+  <p className="underline underline-offset-4 pt-0">
+
+    
+    > a big advantage of open source is tackling long tail problems if
+    you build a tool that needs to support a large number of config (eg
+    languages, frameworks, integration with other tools) OSS is kinda the only
+    way to do it
+  </p>
+</Link>
+
+I think this is really close to being right, plugins are another solution to the problem. A better solution in some cases considering it doesn't require people to modify the source code of the project. Plugins are decoupled contributions.
+
+The downside is you need to think deeply about how to make your system extendible, which not all projects can afford/need
+
+One really interesting thing about plugins is that even small plugins you find for your workflow can make a huge difference. I like thinking back to my experience using zed- a really well made code editor.
+
+I've tried using it a couple times. The initial experience is quite good, it feels great to use and looks very nice.
+
+But, as I start writing code I run into super small frictions that I don't have in my main code editor.
+
+My JSX tags aren't automatically closing. I don't have tailwind autocomplete. I don't have the same git blame views I get from git lens in vscode.
+
+All of these are really minor features that are not core to the code editing experience, but the lack of those features was enough to make me stop using the editor.
+
+I'm sure they have implemented all those features by now. The core point is how important these really small bits of functionality are to me. I wouldn't expect zed to implement all of these minor features themself.
+
+> note, zed does have an extension system, so in the long run I do think they will be very successful (and I'm sure they already are)
+
+The tools you need to make different kinds of software with a model are very diverse. But, the core platform will always be quite similar, I think that's why it seems like everybody is doing the same thing with "AI app builders" (I can probably think of 20 somewhat successful app builders).
+
+Everybody seems to have an opinion of how to build software with agents. Some put more effort into generation speed, others into design quality, others into service integrations. The people who make these apps are quite smart, and they all will have a strong opinion of why their app builder is better for a specific use case.
+
+Why should everyone that has an opinion on the correct way to build software with AI have to rebuild the infra? Think of what it takes to build an AI app builder:
+
+- you need to have some sort of environment for the website dev server to run
+- you need to have a reliable way to edit the code in the project directory
+- you need a reliable way to detect static and runtime errors, and have the model iterate on it
+- you need to handle context management, prompt caching, codebase indexing, applying code to files
+- you need to have a reliable way to rollback changes, view previous versions
+- you need some way to deploy the website so it's publicly accessible
+
+And even if you can build all of this, doing this is very expensive and hard to maintain. Hosting environments for models to run expensive dev servers for thousands of users is not cheap. If you want to keep it all local on the browser, you either need to be a wasm expert, or pay stackblitz a ton of money to license webcontainer.
+
+Now, what does it take to build a unique agent that builds software:
+
+- using a different model
+- giving it access to a unique tool
+- changing the UI/UX of the platform
+- giving it access to unique context for building a specific kind of app
+
+Building a great agent for a very specific task is a reasonable thing a single person could do in a couple weeks.
+
+I think my dream scenario for developing software with models is I'm scrolling twitter one day, I learn about some new really great agent experience, I download it in my existing development environment in 10 seconds, and can start being productive.
+
+Maybe that thing I download is a really niche tool that is very useful for a framework I use, but it solves a very specific problem I have when making software with models.
+
+Another cool thing to reason about is that very soon (maybe even today) you can have models themselves write very useful small plugins.
+
+You can imagine if the plugin system has a very well typed API, a very robust way to verify correctness, and is very expressive, that a model should have no problem building small features for a bunch of different languages/frameworks.
+
+I happened to run across some people on twitter building a really cool note taking app, [Thyme](), and learned they had a similar vision for their plugins system.
+
+@jdvhouten
+
+<Link href="https://x.com/jdvhouten/status/1907835964904325337">
+
+<p className='underline underline-offset-4'>
+
+> Our bet is that AI models will soon be smart enough to let people write their own plugins with little effort. What kind of extensions were you thinking of?
+
+      </p>
+
+    </Link>
+
+For how to actually build this plugin system, I'm still thinking about this. My current plan is to build a set of "core plugins" to learn about what I would need from the API before I start building it.
+
+My ideal plugin system is one where everything is configurable, while keeping the experience of making small changes very simple.
+
+I want to start writing some neovim plugins to get a feel for why everyone loves writing plugins for it.
+
+I'm joining Vercel in the next month or so, and a potential future project will be a plugin system for a future Next.js devtool platform, so I'll have the opportunity to think more about an optimal plugin system when you have to consider real world usage/compatibility.
+
+> I've been very plugin pilled the past few months, I even tried to get a plugin system in React Scan, and even made an [RFC](https://github.com/aidenybai/react-scan/issues/305), but the idea never gained traction

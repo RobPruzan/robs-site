@@ -29,6 +29,7 @@ export const articleNameMap = {
   "zenbu-devlog-intro": "zenbu devlog intro",
   "zenbu-devlog-1": "zenbu devlog #1",
   "zenbu-devlog-2": "zenbu devlog #2",
+  "zenbu-devlog-3": "zenbu devlog #3",
 };
 
 export const BASE_URL =
@@ -42,6 +43,7 @@ export const showArticles = [
   "zenbu-devlog-intro",
   "zenbu-devlog-1",
   "zenbu-devlog-2",
+  "zenbu-devlog-3",
 ];
 
 export const createdAtMap: Record<string, Date> = {
@@ -52,4 +54,5 @@ export const createdAtMap: Record<string, Date> = {
   "zenbu-devlog-intro": new Date("2025-04-27"),
   "zenbu-devlog-1": new Date("2025-04-27"),
   "zenbu-devlog-2": new Date("2025-04-28"),
+  "zenbu-devlog-3": new Date("2025-04-29"),
 };

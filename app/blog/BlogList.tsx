@@ -1,15 +1,15 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
+import Link from "next/link";
 
 interface Article {
-  name: string
-  title: string
-  date: Date
+  name: string;
+  title: string;
+  date: Date;
 }
 
 interface BlogListProps {
-  articles: Article[]
+  articles: Article[];
 }
 
 export function BlogList({ articles }: BlogListProps) {
@@ -27,10 +27,10 @@ export function BlogList({ articles }: BlogListProps) {
                 {article.title}
               </h2>
               <div className="text-white/40 text-sm font-mono">
-                {article.date.toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
+                {article.date.toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
                 })}
               </div>
             </article>
@@ -38,5 +38,5 @@ export function BlogList({ articles }: BlogListProps) {
         ))}
       </div>
     </div>
-  )
-} 
+  );
+}
