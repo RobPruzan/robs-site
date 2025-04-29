@@ -58,7 +58,8 @@ export function Navbar() {
                       : "text-white/60 hover:text-white/80"
                   }`}
                 >
-                  Zenbu Devlog
+                  <span className="hidden sm:inline">Zenbu Devlog</span>
+                  <span className="sm:hidden">Zenbu</span>
                 </Link>
               </nav>
               <div className="flex gap-4 items-center">
