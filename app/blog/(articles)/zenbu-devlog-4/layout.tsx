@@ -1,9 +1,7 @@
-
-
 import type { Metadata } from "next";
 
 const title = "Zenbu Devlog #4";
-const description = "An extensible plugin system";
+const description = "Multiplayer with a single person";
 
 export const metadata: Metadata = {
   title,
@@ -12,7 +10,7 @@ export const metadata: Metadata = {
     title,
     description,
     type: "article",
-    publishedTime: "2025-04-29",
+    publishedTime: "2025-04-30",
   },
   twitter: {
     card: "summary",
