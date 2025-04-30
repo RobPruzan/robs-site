@@ -2,6 +2,7 @@ import { getDirectories } from "@/lib/getDirectories";
 import {
   articleNameMap,
   createdAtMap,
+  descriptionMap,
   isDevlog,
   showArticles,
 } from "@/lib/utils";
@@ -22,6 +23,7 @@ export default async function ZenbuDevlogPage() {
       name,
       title: articleNameMap[name as keyof typeof articleNameMap],
       date: createdAtMap[name],
+      description: descriptionMap[name as keyof typeof descriptionMap],
       isZenbuDevlog: true,
     }));
 
@@ -49,6 +51,11 @@ export default async function ZenbuDevlogPage() {
               <h2 className="text-xl text-white/90 font-mono group-hover:underline">
                 {article.title}
               </h2>
+              {article.description && (
+                <p className="text-base text-white/60 font-mono">
+                  {article.description}
+                </p>
+              )}
               <div className="text-white/40 text-sm font-mono">
                 {article.date.toLocaleDateString("en-US", {
                   year: "numeric",

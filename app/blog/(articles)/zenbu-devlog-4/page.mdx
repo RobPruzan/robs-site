@@ -1,0 +1,148 @@
+import Link from "next/link";
+import Image from "next/image";
+
+### Zenbu Devlog #4
+
+I have a weird desire, I really want to start making an app with some models on desktop, and then instantly start taking over on my phone and editing the app for a mobile view
+
+Evan Bacon demo'd on twitter an app he made that's almost exactly what I want:
+
+<Link href="https://x.com/Baconbrix/status/1904548835143409948">
+  https://x.com/Baconbrix/status/1904548835143409948
+</Link>
+
+<Image
+  src="/devlog/4/bacon.png"
+  alt="Evan Bacon's demo"
+  width={400}
+  height={300}
+/>
+
+Bolt, by stackblitz, also has a related feature where you can make an expo app, scan a qr code, and then you get the expo app on your phone by using expo go.
+
+<Image
+  src="/devlog/4/bolt.png"
+  alt="Bolt QR code scanning feature"
+  width={500}
+  height={300}
+/>
+
+I think we can make this a bit cooler with <Link href="/blog/zenbu-devlog-intro"><span className='underline underline-offset-[3px]'>zenbu</span></Link>
+
+Currently, I have a naive implementation of mobile emulation in the desktop website, so you can pull up a split screen view with what your app will look like on mobile
+
+<Image
+  src="/devlog/4/split.png"
+  alt="Split screen mobile emulation"
+  width={600}
+  height={400}
+/>
+
+Which is pretty cool, but I want to run it on my actual phone and see how the app feels.
+
+It would be cool if I can just pull up a qr code, scan it, and then get the app on my phone. You wouldn't have to wait for the website to build, or deploy. You scan the qr code, and in less than one second you have the development build running right in your mobile browser.
+
+<Image
+  src="/devlog/4/qrb.png"
+  alt="QR code for mobile access"
+  width={500}
+  height={300}
+/>
+
+Once its on my phone, I will probably find something I want to change.
+
+I don't want to go back to my computer to ask for the change. Like Evan Bacon's video, I want to just edit the app from my phone itself
+
+I also want all the tools/extensions zenbu has on mobile. Remember, a goal of zenbu is to allow you to express what you want to the model with more than just text
+
+Working backwards from the ideal implementation, I will need to solve a few problems:
+
+1. how do I get the development website on my phone
+2. how do I make sure hot reloading still works no matter the framework used
+3. how can I change the website from my phone
+4. how do I handle state sync between mobile and desktop as changes are made to each
+5. how can I do this exclusively peer to peer, I don't want users to ever have to send code to a server I host
+
+I could use a tool like tailscale, or ngrok, but zenbu is a free service, and I don't really need all the complexity that comes with those products.
+
+Reasoning from first principles, if I just wanted to get html from a computer I owned to a mobile phone, I could just expose a server to the public internet.
+
+Serving a website directly from your laptop is tricky and dangerous, so that's not an option.
+
+We can't build the website and host it on a VPC, making a production build of a website takes much too long and comes with another set of problems.
+
+The easiest way (that I know of) to solve this is to talk to my phone P2P using WebRTC.
+
+If I had a P2P connection between my phone and laptop, I could just send the html as a JSON encoded message directly to the device, no middleman.
+
+To make a WebRTC connection to my phone, I'll need to host a website that my phone can load, which implements this WebRTC connection logic.
+
+I definitely want the zenbu experience when editing the website, so I may as well publicly host the zenbu website itself and make it mobile friendly.
+
+Zenbu works by loading a preview of the dev server as an iframe that points to the users dev server. The iframe then makes an http request for the website, and now the website is embedded in the page.
+
+But, there's no reason we need to load the html, css, js, etc via HTTP.
+
+We could setup a service worker that intercepts all the network requests, normally made over http, and then use our WebRTC channel to send a message asking the other peer to make the request for us.
+
+The other peer is the desktop website. The desktop website would handle making all the required http requests to load the data, triggered by the message sent over WebRTC from the mobile device. All cookies/auth tokens/origin checks will pass since we are making the requests on the real website.
+
+Then once we load the data, we can forward that data back to the mobile phone, and finally in the service worker we return the data our desktop gave us.
+
+This is like a PWA reading from a cache to support offline mode, but instead of our cache being disk, it's another computer.
+
+We're getting close now, we can load a full website on our mobile phone by asking our desktop for all the data, completely peer to peer.
+
+But, a service worker cannot intercept websocket messages. Which is quite bad, this means hot reloading will not work. Every time a change happens on the desktop, mobile would have to hard refresh and load the new javascript.
+
+This is fine if you hate joy. I want instant reloads, so zenbu will solve this.
+
+> Almost all hot reloading libraries work by making a websocket connection with a dev server, and getting information about patches to make to javascript modules. This way you can change some page functionality without reloading everything/destroying state.
+
+We can just keep tricking the website, but this time by monkey patching the actual websocket API before the hot reloading javascript makes the connection.
+
+When the hot reloading library tries to initiate a `new WebSocket(...)` connection, we will not make a TCP connection to any server from the mobile device. We will forward some data over to the desktop, via WebRTC, telling it to make a websocket connection for us.
+
+Anytime a message tries to be sent over the socket on mobile, we forward the message over the channel, and ask the desktop to send the message
+
+Anytime a message is received on the desktop websocket connection, we forward it to the mobile device, and call the message event listeners with the data
+
+<Image
+  src="/devlog/4/diagram.png"
+  alt="WebRTC connection diagram"
+  width={600}
+  height={400}
+/>
+
+The only problem left to solve is state syncing between mobile and desktop.
+
+Luckily this is very easy, since I originally built zenbu to sync across multiple tabs.
+
+All the shared state already lives in a redis instance on the desktop, not in any one client. Any changes that should be shared/broadcasted across multiple tabs already are.
+
+For example, see how multi tab streaming works:
+
+<video src="/devlog/4/multi-tab.mp4" controls width="600" height="400"></video>
+
+> client message syncing still todo :p
+
+1. Open zenbu on desktop
+2. Scan QR code with mobile
+3. Open zenbu on mobile
+4. Load dev site in iframe
+5. Ask LLM for changes to website
+6. Desktop receives request and updates files
+7. Hot reload triggers
+8. Changes appear on mobile
+
+And then if you wanted to go back to editing your desktop view, you just can, no split brain.
+
+Here's a crappy demo put together in an hour. If you squint you will notice the website on the desktop is on the mobile phone (after quite a few seconds because of bugs I didn't feel like fixing for the demo.)
+
+<video src="/devlog/4/demo.mp4" controls width="600" height="400"></video>
+<Image
+  src="/devlog/4/proof.png"
+  alt="demo proof i swear im not lying"
+  width={500}
+  height={300}
+/>
