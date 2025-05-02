@@ -1,0 +1,76 @@
+import Link from "next/link";
+import Image from "next/image";
+import { IntegrationsGrid } from "./ints";
+
+### Zenbu Devlog #6
+
+
+Popular app builders are starting to allow you to hook up your projects to managed services to give them persistent storage, backends, auth, etc
+
+<IntegrationsGrid />
+When you start a new project, do you eagerly bring in managed services for trivial
+tasks?
+
+Bringing in a product to completely delegate away an important piece of functionality immediately sounds a bit nuts. So, why is this the direction we are going with software made by LLM’s?
+
+There is almost never going to be a hobby project that needs the scalability, optimizations, or soc2 compliance that these managed integrations provide. Persistent storage can be a sqlite file, a backend can be a 15 line hono server.
+
+The simple answer to why this is happening is [leaky abstractions](https://en.wikipedia.org/wiki/Leaky_abstraction#:~:text=A%20leaky%20abstraction%20in%20software,fails%20to%20completely%20do%20so.) of the LLM development environments. It’s much easier to delegate responsibilities to managed services when it means you don’t need to spend lots of engineering hours making the n+1 program work in the environment
+
+When your application is local, things become much easier. Think back to when you used cursor to [vibe code](https://x.com/karpathy/status/1886192184808149383?lang=en) a project, you probably aren't reaching to use supabase for your backend.
+
+Using an opaque service limits what you can do with the model.
+
+When developing locally, you don't consider if your environment can run some piece of niche software. Which means you will use the best tool for the job.
+
+Although I think the ceiling for software you can make with an LLM is higher when the development environment is your computer, there's some work needed to make the floor just as high when using a managed service for simple tasks.
+
+It's very convenient to have a somewhat complex service spun up and ready with just a button click in these app builders. Having a model manually configure the environment is not optimal.
+
+<Image
+  src="/devlog/6/v0-click.gif"
+  height={307}
+  width={500}
+  alt="v0 integration 1 click"
+/>
+
+If a managed service is just a piece of code running on some computer, we of course can replicate that experience locally
+
+What this might look like is right clicking your project, and copying a template directly into your project
+
+<Image
+  src="/devlog/6/right-click.png"
+  height={307}
+  width={500}
+  alt="right click add service"
+/>
+
+The template would come with a readme that describes exactly how the LLM can use the service without reading/modifying the code
+
+Templates can be distributed by the community through <Link href="/blog/zenbu-devlog-2">plugins</Link>
+
+Templates would have to follow a standard format, so all servers can be started, stopped, and inspected the same way. For example, they could be installed in a pnpm workspace, with standardized package.json scripts.
+
+I think the [shadcn cli](https://ouassim.tech/notes/shadcn-registry-a-better-way-to-manage-your-ui-components/) is growing into exactly what I want this to be built around- distribution of code that's meant to be copied into your project.
+
+My ideal workflow when this feature is built into zenbu is:
+
+- start a next.js project in 100ms
+- have an LLM bootstrap a working app
+- right click add some services I want to use in &lt;5s
+- have the LLM integrate the services in 1 prompt
+
+This builds on the idea in <Link href="/blog/zenbu-devlog-intro">zenbu devlog intro</Link>
+
+> Today if I want to create a new project I need to:
+>
+> 1.  go to my terminal
+> 2.  run some starter template CLI
+> 3.  Wait a minute to download all the packages/code
+> 4.  Start the dev server
+> 5.  Wait for it to boot
+> 6.  Open the url.
+>
+> I would create a lot less notes if it took this much effort to make a markdown file. This friction is everywhere when building apps
+
+If you can initialize any service that a model can read and modify successfully, how much more would you build?
