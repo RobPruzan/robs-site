@@ -4,7 +4,7 @@ import { TweetComponent } from "../tweet";
 
 ### Zenbu Devlog #5
 
-Something that's very useful when implementing complex features in complex projects is do as much of the work in an isolated project as possible
+Something that's very useful when implementing hard features in big projects is do as much of the work in an isolated project as possible
 
 Meaning, remove all variables that add complexity:
 
@@ -17,7 +17,7 @@ Meaning, remove all variables that add complexity:
 Make an environment that's optimal for one really complex feature. The environment should be treated as ephemeral.
 
 When I was working at Walmart on the IOS team, this was super helpful to get
-around super long build times. 
+around super long build times.
 
 UIKit has no built in hot reloading library, so every change requires you to rebuild the app. Xcode will cache a good amount of the build for you, but on an app like Walmart, any code change required minutes to see anything update in the simulator.
 
