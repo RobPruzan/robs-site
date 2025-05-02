@@ -8,8 +8,7 @@ const getTweet = unstable_cache(
   ["tweet"],
   { revalidate: 3600 * 24 }
 );
-
-export const TweetComponent = async ({ id }: { id: string }) => {
+export const TweetContent = async ({ id }: { id: string }) => {
   try {
     const tweet = await getTweet(id);
     return tweet ? <EmbeddedTweet tweet={tweet} /> : <TweetNotFound />;
@@ -17,4 +16,12 @@ export const TweetComponent = async ({ id }: { id: string }) => {
     console.error(error);
     return <TweetNotFound error={error} />;
   }
+};
+
+export const TweetComponent = ({ id }: { id: string }) => {
+  return (
+    <Suspense fallback={<TweetSkeleton />}>
+      <TweetContent id={id} />
+    </Suspense>
+  );
 };
