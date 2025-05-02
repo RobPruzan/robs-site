@@ -1,0 +1,128 @@
+import Link from "next/link";
+import Image from "next/image";
+import { TweetComponent } from "../tweet";
+
+### Zenbu Devlog #5
+
+Something that's very useful when implementing complex features in complex projects is do as much of the work in an isolated project as possible
+
+Meaning, remove all variables that add complexity:
+
+- auth
+- code quality
+- data fetching
+- state management
+- build times
+
+Make an environment that's optimal for one really complex feature. The environment should be treated as ephemeral.
+
+When I was working at Walmart on the IOS team, this was super helpful to get
+around super long build times. 
+
+UIKit has no built in hot reloading library, so every change requires you to rebuild the app. Xcode will cache a good amount of the build for you, but on an app like Walmart, any code change required minutes to see anything update in the simulator.
+
+My team at Walmart had a small app that could re-build in seconds, which had the small amount of internal libraries we needed to develop features.
+
+More recently, the way I built the live bug replay system, described in <Link href="/blog/zenbu-devlog-4">zenbu devlog #4</Link>, within just a few hours was by implementing it in a completely separate hello world project to remove all complexity my current repository has
+
+<video
+  id="mirror-demo"
+  style={{
+    height: "400px",
+  }}
+  src="/devlog/5/mirror-demo.mp4"
+  controls
+/>
+
+If a human developer finds a workflow to be useful, an LLM will likely too. In this specific case, I find the "isolated project workflow" to be even more useful for LLM's than humans.
+
+Models tend to struggle pretty badly with grokking a large codebase. Add on top of that a complex feature request with a bad feedback loop and it's unlikely they will get anything done.
+
+The way I get around this is having the model generate some piece of functionality in complete isolation, and once the hard part works I'll port it to work in my full codebase.
+
+For example, when making this @ component I had 0 idea how styling text nodes worked/how I can put some custom UI in the text area without absolutely positioning UI
+
+<video
+  style={{
+    height: "400px",
+  }}
+  src="/devlog/5/at-demo.mp4"
+  controls
+/>
+
+Initially I tried cursor + a few models to generate it, which did not work.
+
+I then tried completely isolating the component from everything in my codebase, and used grok (outside of cursor, so it knew nothing of my codebase) and let it iterate on the single file which had no dependencies.
+
+The result looked nothing like my components in zenbu, and didn't initially integrate with any of my state management. But all I needed was a working example of things styled inside the text area to keep moving.
+
+I think there is a really good way to formalize this way of developing with LLM's, and it lends itself to a bunch of other cool workflows.
+
+These small, well encapsulated environments with tight feedback loops can be though of as "experiments".
+
+You should have the ability to spin up an experiment instantly, have the model work and iterate on it autonomously, and alert you when it's completed or has stopped making progress.
+
+I, of course, want the ability to do this in zenbu.
+
+Right now, core actions in zenbu are taken through the command menu, as seen here:
+
+<Image src="/devlog/demo.gif" height={307} width={500} alt="zenbu demo gif" />
+
+My ideal UX for this feature is to spawn an experiment directly through the tab menu:
+
+<Image
+  src="/devlog/5/command-demo.png"
+  alt="Command menu in Zenbu"
+  width={600}
+  height={400}
+/>
+
+I would want some way to easily view the current status of my cooking experiments:
+
+<Image
+  src="/devlog/5/progress-example.png"
+  alt="Experiment progress view"
+  width={600}
+  height={400}
+/>
+
+And some way to easily view the actual experiment output from my main website
+
+<Image
+  src="/devlog/5/mini-view.png"
+  alt="Tab menu for spawning experiments"
+  width={600}
+  height={400}
+/>
+
+And some way to focus on it when I need to lock in and help the model iterate on it
+
+<Image
+  src="/devlog/5/expanded-view.png"
+  alt="Expanded experiment view"
+  width={600}
+  height={400}
+/>
+
+When done, I want a dedicated model to integrate it into my main app
+
+<Image
+  src="/devlog/5/integration.png"
+  alt="Focused experiment view"
+  width={600}
+  height={400}
+/>
+
+Because the experiment definitely works in a simplified environment, the model will have a prior that the underlying code does work. This is extremely helpful when eliminating potential causes for introduced bugs during integration
+
+Luckily, Zenbu already has all the building blocks to make this happen. I already spent time to allow projects to be started in &lt;100ms with my "local serverless runtime" described in <Link href="/blog/zenbu-devlog-1">zenbu devlog #1</Link>
+
+<TweetComponent id="1913607633153491158" />
+
+Switching between parallel projects while maintaining state is already how zenbu works
+
+So, all that's needed to implement this is almost purely UX related code to change how you interact with your existing projects.
+
+The only thing I'll need to change on the backend/agent side is some logic for the "experiment integration part". The model needs to know about at least 2 projects at once, and currently zenbu doesn't support that.
+
+Also may need to fix some bugs when multitasking projects to make this work smoothly, but gonna try to whip this up tomorrow. I kind of want an OS window manager feel, but will need to experiment with different ux (pun intended)

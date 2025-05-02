@@ -1,20 +1,22 @@
 import Link from "next/link";
 import Image from "next/image";
+import { TweetComponent } from "../tweet";
 
 ### Zenbu Devlog #4
 
-I have a weird desire, I really want to start making an app with some models on desktop, and then instantly start taking over on my phone and editing the app for a mobile view
+I really want to start making an app with some models on desktop, and then instantly start taking over on my phone and editing the app for a mobile view
 
 Evan Bacon demo'd on twitter an app he made that's almost exactly what I want:
 
-<Link href="https://x.com/Baconbrix/status/1904548835143409948">The Tweet</Link>
+<TweetComponent id="1904548835143409948"/>
+{/* <Link href="https://x.com/Baconbrix/status/1904548835143409948">The Tweet</Link>
 
 <Image
   src="/devlog/4/bacon.png"
   alt="Evan Bacon's demo"
   width={400}
   height={300}
-/>
+/> */}
 
 Bolt, by stackblitz, also has a related feature where you can make an expo app, scan a qr code, and then you get the expo app on your phone by using expo go.
 
