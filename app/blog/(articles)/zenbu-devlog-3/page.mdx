@@ -1,4 +1,5 @@
 import Link from "next/link";
+import {TweetComponent} from "../tweet"
 import Image from "next/image";
 
 ### Zenbu Devlog #3
@@ -20,15 +21,7 @@ One of my favorite properties of extensible systems is that you can build really
 
 I saw a tweet I liked a lot from dax the other day that related to this idea:
 
-<Link href="https://x.com/thdxr/status/1916519912043917334">
-    @thdxr
-
-    > a big advantage of open source is tackling long tail problems if
-    you build a tool that needs to support a large number of config (eg
-    languages, frameworks, integration with other tools) OSS is kinda the only
-    way to do it
-
-</Link>
+<TweetComponent id="1916519912043917334" />
 
 I think this is really close to being right, plugins are another solution to the problem. A better solution in some cases considering it doesn't require people to modify the source code of the project. Plugins are decoupled contributions.
 
@@ -82,13 +75,7 @@ You can imagine if the plugin system has a very well typed API, a very robust wa
 
 I happened to run across some people on twitter building a really cool note taking app, [Thyme](), and learned they had a similar vision for their plugins system.
 
-@jdvhouten
-
-<Link href="https://x.com/jdvhouten/status/1907835964904325337">
-
-> Our bet is that AI models will soon be smart enough to let people write their own plugins with little effort. What kind of extensions were you thinking of?
-
-    </Link>
+<TweetComponent id="1907835964904325337" />
 
 For how to actually build this plugin system, I'm still thinking about this. My current plan is to build a set of "core plugins" to learn about what I would need from the API before I start building it.
 
