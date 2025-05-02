@@ -27,16 +27,11 @@ My team at Walmart had a small app that could re-build in seconds, which had the
 
 More recently, the way I built the live bug replay system, described in <Link href="/blog/zenbu-devlog-4">zenbu devlog #4</Link>, within just a few hours was by implementing it in a completely separate hello world project to remove all complexity my current repository has
 
-<video
-  playsInline
-  muted
-  preload="metadata"
-  id="mirror-demo"
-  style={{
-    height: "400px",
-  }}
-  src="/devlog/5/mirror-demo.mp4"
-  controls
+<Image
+  src="/devlog/mirror-demo.gif"
+  height={307}
+  width={500}
+  alt="mirror demo gif"
 />
 
 If a human developer finds a workflow to be useful, an LLM will likely too. In this specific case, I find the "isolated project workflow" to be even more useful for LLM's than humans.
@@ -47,13 +42,11 @@ The way I get around this is having the model generate some piece of functionali
 
 For example, when making this @ component I had 0 idea how styling text nodes worked/how I can put some custom UI in the text area without absolutely positioning UI
 
-<video
-
-style={{
-    height: "400px",
-  }}
-src="/devlog/5/at-demo.mp4"
-controls
+<Image
+  src="/devlog/at-demo.gif"
+  height={307}
+  width={500}
+  alt="at demo gif"
 />
 
 Initially I tried cursor + a few models to generate it, which did not work.
