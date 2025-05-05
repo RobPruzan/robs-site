@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-const title = "Zenbu Devlog #7";
-const description = "your empire";
+const title = "Your empire";
+const description = "zenbu devlog #7";
 
 export const metadata: Metadata = {
   title,

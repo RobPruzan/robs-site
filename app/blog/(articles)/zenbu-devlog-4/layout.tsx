@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-const title = "Zenbu Devlog #4";
-const description = "Multiplayer with a single person";
+const title = "Multiplayer with a single person";
+const description = "zenbu devlog #4";
 
 export const metadata: Metadata = {
   title,

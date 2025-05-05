@@ -2,8 +2,8 @@
 
 import type { Metadata } from "next";
 
-const title = "Zenbu Devlog #1";
-const description = "Where we are on progress";
+const title = "Project snapshot";
+const description = "zenbu devlog #1";
 
 export const metadata: Metadata = {
   title,

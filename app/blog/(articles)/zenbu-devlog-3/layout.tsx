@@ -2,8 +2,8 @@
 
 import type { Metadata } from "next";
 
-const title = "Zenbu Devlog #3";
-const description = "An extensible plugin system";
+const title = "Plugins everywhere";
+const description = "zenbu devlog #3";
 
 export const metadata: Metadata = {
   title,

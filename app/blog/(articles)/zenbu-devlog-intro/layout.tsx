@@ -1,18 +1,21 @@
 import type { Metadata } from "next";
 
+const title = "What is zenbu";
+const description = "zenbu devlog intro";
+
 export const metadata: Metadata = {
-  title: "Zenbu Devlog Intro",
-  description: "Introduction to my new project and why I'm building it",
+  title,
+  description,
   openGraph: {
-    title: "Zenbu Devlog Intro",
-    description: "Intro to my new project and why I'm building it",
+    title,
+    description,
     type: "article",
     publishedTime: "2025-04-27",
   },
   twitter: {
     card: "summary",
-    title: "Zenbu Devlog Intro",
-    description: "Introduction to my new project and why I'm building it",
+    title,
+    description,
   },
 };
 
