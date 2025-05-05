@@ -1,0 +1,117 @@
+import Link from "next/link";
+import Image from "next/image";
+
+### Zenbu Devlog #7
+
+
+
+I've been thinking a lot about how I want to market zenbu to the public. I can think of a million directions I could take it.
+
+- I could compete with app builders
+- I can market it as a devtool that attaches to every website (think [react-scan](https://react-scan.com/))
+- I can make it really good for only one framework
+	- for some number of days I was convinced I would call it "next studio" and just make it a really good development platform when working with next.js.
+
+Now that zenbu is in a state where I can use it, I can observe what I like about it, and what I don't. It makes it a lot easier to reason about which features I want to build out further.
+
+I ended up falling in love with the ability of making software as fast as possible
+
+This emerged since I had optimized for projects to be created and swapped instantly. There was one night I was using zenbu and got to the point I was generating 5 video games in parallel and laughing the whole time.
+
+The games were quite horrible, but fun to make nonetheless:
+
+<Image src="/devlog/7/game.gif" alt="Video game demo created with Zenbu" width={200} height={450} />
+
+
+
+The original thesis in <Link href="/blog/zenbu-devlog-intro">zenbu devlog intro</Link> had an idea of making software as easy to create as making a markdown file, but I didn't realize how fun this would make creating software.
+
+Since I was creating so much software at once, I wanted zenbu to be very ergonomic when multi tasking.
+
+I'm in love with the macos stage manager, it's the best GUI based window manager UX i've used. And I think it would work even better in the context of developing websites in parallel
+
+I decided to spin up a prototype for zenbu to explore what it might feel like, which I loved:
+<Image src="/devlog/7/stage-manager-demo.gif" alt="Zenbu stage manager prototype" width={800} height={450} />
+I started to get more inspired by the UX of OS's (mentioned in <Link href="/blog/zenbu-devlog-6">zenbu devlog #6</Link>). I thought about everything an OS does, and tried to take the best pieces from that.
+
+For example, I spun up a prototype of what a home screen might look like that interfaces with zenbu.
+
+<Image src="/devlog/7/home.png" alt="Zenbu home screen prototype" width={800} height={450} />
+
+I became very obsessed with this specific view. I realized zenbu did not have to be a place you only create software in- it's also the perfect place to consume software.
+
+Imagine you generated dozens of apps through the editor:
+<Image src="/devlog/7/editor.png" alt="Zenbu editor with multiple apps" width={800} height={450} />
+And then were able to organize all your apps into workspaces, launchable directly from zenbu.
+<Image src="/devlog/7/workspace.png" alt="Zenbu workspace organization" width={800} height={450} />
+Because zenbu controls the process the dev server runs in, all websites can be started/stopped at will, without having to deploy the website.
+
+If this UX existed, you could build a garden of software just for you. Everything is personalized to you, and will always be accessible
+
+I started thinking about what I might do, as a user, if I had a platform like this. The first thing that came to mind is all the tools I can make for myself when the tools can talk directly to my computer.
+
+For this project (zenbu) I spun up a redis instance, and I really wanted a gui to play with the data inside of it. Of course I can search for such a tool online, that probably does more than I want. 
+
+Or, I can create the app in zenbu, have it read from the port redis exposed, and start using the tool. The tool would always be in my "devtool" workspace, and could be edited by me whenever I want.
+
+I started listing dozens of cool tools I could make for myself that read/write data directly from my computer. All the websites would have the power of native apps/widgets, and can be generated nearly instantly. 
+
+At this point, I was sure this was the direction I wanted to go with. I very much want to live in a world where I can ergonomically create personal software which lives on mt computer, and is organized + personalized how I want.
+
+Since I was infatuated by the idea, I tried to take the idea further to see where its natural ending was.
+
+One trick I like using for reasoning how good a technology could be is pretending like I was teleported into the near distant future. I imagine what would be in front of me, and how it would behave
+
+When I think about this w.r.t AI, it seems clear we will have very cheap models that are very smart. To the point where they can probably run directly on device, or the API's won't have any rate limits/pay walls. Today, gemini flash 2.5 is only ~50 cents per million input/output token, which is ridiculous. 
+
+I can't imagine how much cheaper and faster models will be in the near distant future. For a huge value unlock, they don't need to get smarter, just cheaper and faster. This idea was explored more in <Link href="https://gwern.net/blog/2025/llms-can-be-faster">gwern's post</Link>
+
+Thinking about that value unlock for zenbu, it gets pretty insane.
+
+Imagine zenbu had some insight into your personal life- enough data that zenbu can have a decent understanding about what you're currently doing.
+
+If models were cheap and fast, zenbu could have 1000 ideas generated about how to improve the situation you were just in. Those 1000 ideas turn into 1000 model threads that try to build the idea.
+
+Every minute, 1000 new model instances are trying to build something for you. In one month time you have 1,000,000 apps built that solve something for you. Maybe half of them suck, another quarter aren't very great, but many will be extremely useful to you.
+
+Whenever you want some software, you probably wont generate it on demand. You will just search in your personal marketplace made up of software created just for you.
+
+If you find an app that's almost perfect, you can of course start editing it in zenbu so it behaves as you want
+models that exists 
+> The fact you can change the software however you want is quite powerful. Imagine downloading traditional software, and then changing something in seconds, as opposed to making a feature request into the abyss 
+
+
+In this world, its almost like you have a mini empire that exists just to benefit your life. You say an idea in a passing breath, and immediately 10,000 variations are created. The physical footprint of the empire isn't land, but the software made by all these models
+
+
+<Image src="/devlog/7/empire.png" alt="laughing over your empire" width={300} height={450} />
+
+
+Thinking about this as an empire is pretty fun, so I kept doing it. For example, if this is my empire, I should be able to do similar things real empires do, like trade.
+
+If you have some group of friends who all use zenbu, and all the software made is personalized to each person, you could imagine a friend having software made for them that you don't have yet.
+
+As you have millions of generations made by your empire, you likely have some valuable software at this point. You could decide to make a free trade agreement with your friend's empire- this allows you two to share software made by your empires freely.
+
+This means all software your friend has is yours, and all your software is his. No cost was incurred for either party, as the cost to generate the software was nothing. 
+
+
+<Image src="/devlog/7/trade.png" alt="trading between empires" width={400} height={500} />
+
+Though, free trade agreements imply paid trade agreements. 
+
+Instead of negotiating a free trade agreement, you could negotiate a simpler 1:1 trade for software. You trade something you had made for you, for their software you really want.
+
+In this world you are not bounded by currency. You are bounded by the ideas you have.
+
+The better the idea, the more valuable the software is to other people. They will be willing to give you a great deal of their software made with their ideas, since they would be able to use your software.
+
+<Image src="/devlog/7/barter.png" alt="trading between empires, serious mode" width={400} height={500} />
+
+This is quite fun to think about, since you're creating a mini economy that behaves more like trading pokemon vs the real life economy. 
+
+But,  I'm not sure if people would want such a way of distributing software, and nothing like this seems to be emerging from image gen, which is a few years ahead of software gen.
+
+What am I confident about is having a ton of personal software made for you would be awesome. And this only gets easier to do as models get better, cheaper, and smarter.
+
+Next step is to build out this idea over the next couple days, and then see which parts I want to take further.

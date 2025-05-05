@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const title = "Zenbu Devlog #5";
+const title = "Zenbu Devlog #6";
 const description = "your software";
 
 export const metadata: Metadata = {
