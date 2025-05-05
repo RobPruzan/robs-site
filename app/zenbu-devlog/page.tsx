@@ -28,7 +28,7 @@ export default async function ZenbuDevlogPage() {
     }));
 
   return (
-    <div className="max-w-[1400px] mx-auto px-4 md:px-6">
+    <div className="max-w-[1400px] mx-auto px-4 md:px-6 pb-3">
       <div className="space-y-12">
         <div className="-mt-2 -mb-4">
           <a
@@ -49,13 +49,13 @@ export default async function ZenbuDevlogPage() {
           >
             <article className="space-y-2">
               <h2 className="text-xl text-white/90 font-mono group-hover:underline">
-                {article.title}
+                {article.description}
               </h2>
-              {article.description && (
+              {/* {article.description && (
                 <p className="text-base text-white/60 font-mono">
                   {article.description}
                 </p>
-              )}
+              )} */}
               <div className="text-white/40 text-sm font-mono">
                 {article.date.toLocaleDateString("en-US", {
                   year: "numeric",
