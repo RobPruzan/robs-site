@@ -1,7 +1,7 @@
 "use client";
 
 import { getDirectories } from "@/lib/getDirectories";
-import { showArticles, createdAtMap, articleNameMap } from "@/lib/utils";
+import { showArticles, createdAtMap, articleNameMap, descriptionMap } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -30,7 +30,9 @@ export const MoreArticles = ({
                 className="underline underline-offset-4"
                 href={`/blog/${name}`}
               >
-                {articleNameMap[name as keyof typeof articleNameMap] ?? name}
+                {
+                 name.includes("devlog")  ? descriptionMap[name] :
+                  articleNameMap[name as keyof typeof articleNameMap] ?? name}
               </Link>
             </div>
             <span>{createdAtMap[name].toLocaleDateString()}</span>
