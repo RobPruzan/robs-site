@@ -109,7 +109,7 @@ export default function Home() {
           </p>
         </div>
       ),
-      link: "/blog/react-from-scratch",
+      link: "https://github.com/RobPruzan/zenbu",
       size: "medium" as const,
       images: ["/zenbu-1.png", "/zenbu-2.png", "/zenbu-3.png", "/zenbu-4.png"],
     },
