@@ -158,7 +158,7 @@ export function ProjectCard({
                   {longDescription}
                 </p>
               </DrawerHeader>
-              <div className="px-4 pb-8 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+              <div className="px-4 pb-8 overflow-y-auto" style={{ maxHeight: 'calc(100dvh - 200px)' }}>
                 {contributions && (
                   <div className="space-y-2">
                     <h4 className="text-white/80 font-mono text-xs">Overview:</h4>
