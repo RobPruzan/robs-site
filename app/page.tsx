@@ -26,50 +26,86 @@ export default function Home() {
             the core technology is very promising. But I never found them useful
             in my real workflow. I am probably one of the most optimistic people
             in the world about AI, but I try to avoid it when developing real
-            projects, which is unfortunate. I want a set of tools that makes developing
-            and experimenting with models productive.
+            projects, which is unfortunate. I want a set of tools that makes
+            developing and experimenting with models productive.
           </p>
           <p>
-            One huge issue I find with the coding agent tools (cursor agent
-            etc) is that I rarely want to collaborate with a model when coding.
-            Even if the model was super intelligent and never wrong, I have a
+            One huge issue I find with the coding agent tools (cursor agent etc)
+            is that I rarely want to collaborate with a model when coding. Even
+            if the model was super intelligent and never wrong, I have a
             significant productivity boost when I understand the entire system
             I'm working in (where a system can just be a tiny module I'm
             writing). Collaborating an agent (us both writing to the same file)
             makes me lose all my creativity and agency as the project goes on.
           </p>
           <p>
-            AI app builders solve this by making projects ephemeral, where code is an implementation detail. When you use tools like v0, you likely never think about the code, and it feels quite great when it works. But, if you decide to use the code for a project, you hit the exact same problems as above.
+            AI app builders solve this by making projects ephemeral, where code
+            is an implementation detail. When you use tools like v0, you likely
+            never think about the code, and it feels quite great when it works.
+            But, if you decide to use the code for a project, you hit the exact
+            same problems as above.
           </p>
           <p>
-            There is a continuous curve describing this, where the more depth your project has, the more friction there is from adding an agent to your workflow. Though, I have had many instances where having an "agent" collaborate with me is very productive, as the work didn't have much depth. So I still needed to allow this to happen in zenbu.
+            There is a continuous curve describing this, where the more depth
+            your project has, the more friction there is from adding an agent to
+            your workflow. Though, I have had many instances where having an
+            "agent" collaborate with me is very productive, as the work didn't
+            have much depth. So I still needed to allow this to happen in zenbu.
           </p>
           <p>
-            Now to describe zenbu - zenbu is just a javascript library you install into your project. All setup is done automatically with a compiler script. The library injects devtools over your website that you can interact with when you are developing.
+            Now to describe zenbu - zenbu is just a javascript library you
+            install into your project. All setup is done automatically with a
+            compiler script. The library injects devtools over your website that
+            you can interact with when you are developing.
           </p>
           <p>
-            When you start your dev server, an associated "zenbu server" is spawned. The devtools injected over your website can communicate to this server, meaning the devtools have a complete understanding of all your code, and your operating system. Because the zenbu server is on your computer, it can read/write files on your computer.
+            When you start your dev server, an associated "zenbu server" is
+            spawned. The devtools injected over your website can communicate to
+            this server, meaning the devtools have a complete understanding of
+            all your code, and your operating system. Because the zenbu server
+            is on your computer, it can read/write files on your computer.
           </p>
           <p>
-            You can have coding agents spawn projects anywhere in your computer, or you can point it directly at your current project (the default), to have the traditional "vibe coding" experience.
+            You can have coding agents spawn projects anywhere in your computer,
+            or you can point it directly at your current project (the default),
+            to have the traditional "vibe coding" experience.
           </p>
           <p>
-            Zenbu allows you to generate devtools for your project on the fly - which can be thought of as an evolution of a console log. It also allows you to generate experiments, which are isolated projects outside your codebase that have an agent autonomously implementing based on a proposal you laid out.
+            Zenbu allows you to generate devtools for your project on the fly -
+            which can be thought of as an evolution of a console log. It also
+            allows you to generate experiments, which are isolated projects
+            outside your codebase that have an agent autonomously implementing
+            based on a proposal you laid out.
           </p>
           <p>
-            Zenbu provides a large set of general devtools that are useful in isolation, and when paired with AI. You can save devtools made for you by the model in persistent workspaces. These devtools can also be published and installed by other people.
+            Zenbu provides a large set of general devtools that are useful in
+            isolation, and when paired with AI. You can save devtools made for
+            you by the model in persistent workspaces. These devtools can also
+            be published and installed by other people.
           </p>
           <p>
-            Zenbu also allows more than apps to be created, general services can be developed. Services can be thought of as some blob of code that has a programmatic API, where apps have a graphical interface.
+            Zenbu also allows more than apps to be created, general services can
+            be developed. Services can be thought of as some blob of code that
+            has a programmatic API, where apps have a graphical interface.
           </p>
           <p>
-            If an LLM can generate a perfect implementation of a service with a well thought out API (perhaps one proposed by you), then there is no need to see the code the model wrote, as you wont understand it anyways- the model can write code much faster than we can understand. Of course the code is still in your project, and you could view it. But that's not what you look at as the agent codes.
+            If an LLM can generate a perfect implementation of a service with a
+            well thought out API (perhaps one proposed by you), then there is no
+            need to see the code the model wrote, as you wont understand it
+            anyways- the model can write code much faster than we can
+            understand. Of course the code is still in your project, and you
+            could view it. But that's not what you look at as the agent codes.
           </p>
           <p>
-            Zenbu shows you what you actually care about when "vibe coding" services- test states, architecture descriptions, HTTP clients, graphical devtools generated on demand to understand these services.
+            Zenbu shows you what you actually care about when "vibe coding"
+            services- test states, architecture descriptions, HTTP clients,
+            graphical devtools generated on demand to understand these services.
           </p>
           <p>
-            This sounds like a lot of complexity and product scope, but all these features are surprisingly cohesive and complementary. Each feature has had a lot of thought put into progressively disclosing it.
+            This sounds like a lot of complexity and product scope, but all
+            these features are surprisingly cohesive and complementary. Each
+            feature has had a lot of thought put into progressively disclosing
+            it.
           </p>
         </div>
       ),
@@ -77,34 +113,7 @@ export default function Home() {
       size: "medium" as const,
       images: ["/zenbu-1.png", "/zenbu-2.png", "/zenbu-3.png", "/zenbu-4.png"],
     },
-    {
-      title: "React from Scratch",
-      description: "Re-implementation of React",
-      longDescription:
-        "A complete re-implementation of React w/ custom architecture, and a blog post describing it in detail",
-      contributions: (
-        <div className="space-y-3">
-          <p>
-            I implemented the core functionality of React (rendering,
-            reconciliation, hooks) without referencing React's implementation.
-            The goal was to understand how the abstractions were implemented,
-            and the motivations behind them.
-          </p>
-          <p>
-            Linked above is a blog post going over my thought process when
-            making this to share the intuitions I built.
-          </p>
-        </div>
-      ),
-      link: "/blog/react-from-scratch",
-      size: "medium" as const,
-      images: [
-        "/memo-code.png",
-        "/reconciliation.png",
-        "/react.png",
-        "/position.png",
-      ],
-    },
+
     {
       title: "React Scan",
       link: "https://github.com/aidenybai/react-scan",
@@ -144,6 +153,34 @@ export default function Home() {
         "/toolbar-expanded.png",
         "/notifications.png",
         "/monitoring.png",
+      ],
+    },
+    {
+      title: "React from Scratch",
+      description: "Re-implementation of React",
+      longDescription:
+        "A complete re-implementation of React w/ custom architecture, and a blog post describing it in detail",
+      contributions: (
+        <div className="space-y-3">
+          <p>
+            I implemented the core functionality of React (rendering,
+            reconciliation, hooks) without referencing React's implementation.
+            The goal was to understand how the abstractions were implemented,
+            and the motivations behind them.
+          </p>
+          <p>
+            Linked above is a blog post going over my thought process when
+            making this to share the intuitions I built.
+          </p>
+        </div>
+      ),
+      link: "/blog/react-from-scratch",
+      size: "medium" as const,
+      images: [
+        "/memo-code.png",
+        "/reconciliation.png",
+        "/react.png",
+        "/position.png",
       ],
     },
     {
