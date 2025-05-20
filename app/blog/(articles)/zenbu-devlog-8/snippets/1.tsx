@@ -1,30 +1,26 @@
 // @ts-nocheck
+import { useEffect } from "react";
+
 const [stdout, setStdout] = useState("");
 
-const [stdErr, setStdErr] = useRemote(() => {
+useRemote(() => {
   "use remote";
-  const [stdErr, setStdErr] = useState("");
-
-  process.on("stdout", (data) => {
-    setStdout((prev) => [...prev, data]);
-  });
-
-  process.on("stderr", (data) => {
-    setStdErr((prev) => [...prev, data]);
-  });
-
-  return [stdErr, setStdErr];
+  useEffect(() => {
+    const handleStdout = (data) => {
+      setStdout((prev) => [...prev, data]);
+    };
+    process.on("stdout", handleStdout);
+    return () => {
+      process.off("stdout", handleStdout);
+    };
+  }, []);
 });
 
 return (
   <>
-    <div>
-      {stdout}
-      {stdErr}
-    </div>
+    <div>{stdout}</div>
     <button
       onClick={() => {
-        setStdErr("");
         setStdout("");
       }}
     >
