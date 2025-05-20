@@ -57,7 +57,7 @@ Enough people agree that there are several ways to use RPC's on the web:
 
 But a key fact about these RPC's is they are unidirectional in nature (when they use HTTP), and they still treat the server as a distinct entity. It may look like you are calling a local function, but the semantics are significantly different- all these functions are running outside of React! You can't run a react hook inside this procedure, and you can't send messages back to the browser outside of the response (if you are using HTTP)
 
-This means frequently when you want to write a remote procedure, you must break outside the react state life cycle, and then use "escape hatches" to sync state with that external process .
+This means frequently when you write a remote procedure, you must break outside the react state life cycle, and then use "escape hatches" to sync state with that external process .
 
 For example, what if you wanted to display the users stdout for a given process in the browser? You may think you can use next.js server functions perhaps to do something like this:
 
