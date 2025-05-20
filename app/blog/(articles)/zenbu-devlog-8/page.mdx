@@ -1,0 +1,168 @@
+import Link from "next/link";
+import Image from "next/image";
+import { SuspenseEditor } from "../../../../lib/WithCodeTab.tsx";
+
+### What is kyju
+
+Kyju is a JavaScript library for building web based devtools. Specifically, it solves:
+
+- how to communicate with different processes (iframe's/local servers) from your devtool
+- accessing messy/platform dependent browser API's
+- how to expose the devtools to LLM's
+- how to consistently build devtools that live on top of websites
+
+The web has become a great place to build applications, as the result of years of investment. Most people take for granted how easy it is to create a react project with tools like next.js/vite. Without it, you need to solve hot reloading, bundling, build tooling, code splitting, scaleable UI patterns, and 1000 other things all yourself.
+
+Unfortunately, web applications and devtools don't have as much overlap as you would expect. To list a few differences (with some generalizations made):
+
+- devtools are published to registries, not served over https
+- devtools run on top of an existing website
+- devtools with servers are local and don't need to consider a network boundary
+- a devtools primary data source is a website it's monitoring, not a database
+
+These differences are large enough that we have to re-solve many problems that applications once had, and solve new problems applications have never encountered
+
+## Features
+
+### Boiler plate for creating a devtool
+
+- react
+  - don't have to worry about configuring shadow roots, build configuration for typescript/jsx, not breaking the users app by running a second react instance
+- build tools
+  - esbuild, tailwind, typescript paths, directives
+- hot reloading
+  - react refresh
+- instantly NPM publishable
+
+### Multi process communication
+
+Many devtools are separated from their data source by some boundary. For example, if you are an extension, need to access data from a local server, or need to access data from a cross origin iframe, you need to share state using a message API (postMessage, websocket message, etc).
+
+The boundary you are sending messages across is arbitrary, and only exists because there's some data in another process that doesn't exist in the devtool's process.
+
+To prove this boundary is arbitrary- imagine you needed to get the users CPU usage for a performance devtool that runs in a website. Assume the browser the devtool was running in had 0 sandboxing or permissions.
+
+Would you rather:
+
+- write a local server, which is exposed via http, that internally calls functions to get the users CPU usage, and then in the browser access it by calling `fetch`
+- just call `window.getCpuUsage()` directly in the browser?
+
+Most people would pick `window.getCpuUsage`, as semantically that's exactly what you're doing. The boundary between your browser and the operating system isn't important in this context.
+
+Enough people agree that there are several ways to use RPC's on the web:
+
+- trpc
+- next.js server functions
+- many many more
+
+But a key fact about these RPC's is they are unidirectional in nature (when they use HTTP), and they still treat the server as a distinct entity. It may look like you are calling a local function, but the semantics are significantly different- all these functions are running outside of React! You can't run a react hook inside this procedure, and you can't send messages back to the browser outside of the response (if you are using HTTP)
+
+This means frequently when you want to write a remote procedure, you must break outside the react state life cycle, and then use "escape hatches" to sync state with that external process .
+
+For example, what if you wanted to display the users stdout for a given process in the browser? You may think you can use next.js server functions perhaps to do something like this:
+
+<SuspenseEditor
+  filePath="./app/blog/(articles)/zenbu-devlog-8/snippets/2.tsx"
+  noCheck
+/>
+
+But of course you can't, setStdout in the remote procedure has no way to send that data back to the real setStdout in the main website. Meaning you will need a websocket connection, which forces you to break outside the react life cycle
+
+But, what if this arbitrary limitation did not exist? What if the remote function behaved exactly like a local one, meaning you could write react hooks, access context from parent components, and set state.
+
+Then we would have an app that feels single threaded, and all state would be controlled inside of React. We can throw away 90% of our useEffects and event listeners just to access trivial data that we are forced to send over a message API
+
+But is this possible? How could you run the remote procedure in the context of the website's react instance? These seem mutually exclusive.
+
+If we visually drew a react tree, it might look like:
+
+<Image
+  src="/devlog/8/pointer.png"
+  alt="a simple react component tree"
+  width={400}
+  height={200}
+/>
+
+where it has some nodes (the component instances) and pointers to other component instances.
+
+But, what are the pointers?
+
+They're a javascript object reference, which is an abstraction over a pointer to some location in memory. This means the react component tree is already separated by some distance. But, of course, as a programmer we don't really care, the API is designed such that the data structure feels continuous.
+
+So, can we use other boundaries than "separation in RAM/cache"?
+
+Why not a network boundary instead, where a pointer is just a url
+
+<Image
+  src="/devlog/8/network-pointer.png"
+  alt="2 react component tree's connected by a network boundary"
+  width={400}
+  height={200}
+/>
+
+Inside `<ServerApp/>` would be a valid instance of react running. Any functions called by `<ServerApp/>` that originated in a parent component would just be a remote procedure call to that function on the original website (all abstracted away from the caller).
+
+What this means is you could write code that looks like this:
+
+<SuspenseEditor
+  filePath="./app/blog/(articles)/zenbu-devlog-8/snippets/1.tsx"
+  noCheck
+/>
+
+And... it would just work?
+
+I want to emphasize that this is designed for communicating with a stateful local process, where client:server is 1:1 (the arbitrary boundary described earlier). This allows us to not be burdened by UX concerns from communicating over a large network boundary. Crossing the boundary only costs us on the order of microseconds.
+
+## Abstracting messy platform API's
+
+Most web API's that are used for building web applications are highly standardized and available on all browsers. Though, in the past this was not the case. Libraries like jquery standardized and simplified many browser API's, and this utility is clear by jquery's past adoption.
+
+While standardization of many API's has made jquery less useful, this standardization has not came for what I call "devtool" API's- API's that are meant for accessing debug data in the browser. This ends up forcing you to become a browser expert to implement cross platform devtools.
+
+For the API's that are standardized, they are riddled with foot guns. For example, if you wanted to make a devtool that overlaid something over HTML elements on the users website, how would you measure the HTML elements position to layout the overlay?
+
+The most common answer is `element.getBoundingRect()`- but this forces your browser to immediately recalculate the layout values for the elements on the page every time you call it.
+
+This becomes a massive bottleneck very fast, as forced relayouts can be extremely expensive. The most performant solution is unintuitive- use `IntersectionObserver`, and then async listen for an entry from the API, which ends up containing the elements position. The browser does this calculation off the main thread.
+
+You once again are forced to become a browser expert to implement a quite standard feature. These problems exist everywhere if you are approaching web API's from the perspective of a devtool.
+
+kyju's utilities solve all these problems for you internally.
+
+### Automatic MCP servers
+
+For any devtool that is useful to a human, it can also be useful to an LLM. If there was a button we can click that would make all our devtools data available to the LLM, everyone would press it.
+
+The problem is actually exposing this data to the LLM is quite difficult.
+
+You would want all LLM's to be able to access this data (like inside cursor), not just an LLM you have in your application. So, you need some way to tell external LLM's about the tools you can run for it. Luckily, the problem of how does the LLM discover your tool is solved by the MCP protocol
+
+Now, how are you going to execute the tool call when asked? The MCP client (cursor, for example) will communicate over HTTP to your MCP server and ask you to execute some function. That means you need to host a server, which of course you can't do on the browser.
+
+Now you have 2 options:
+
+- host an MCP server exposed to the public internet
+- run a local mcp server on the users computer
+
+To pick the right option, it's good to fully understand the problem- If we have an MCP server that received a tool call command, how will we run the tool? We need to access some data on the users local website to run this tool, which means we need to have some way to communicate with it.
+
+If we hosted the MCP server on the public internet, that means for every user we have, they are pushing data up to our server. Which has some nasty implications:
+
+- the users potentially private data is going through your server
+- that may be a lot of load
+
+So that means the best option in most cases for a devtool is to run a local MCP server.
+
+But, we need the user to somehow run this server for us manually. We can't ask them to explicitly run the server, since that would be an awful experience. We also can't assume the user has an existing server that we can extend, since the user might not be making an app that has a server!
+
+Though, luckily, almost all modern apps use a dev server, which we can hook into. And one great property of dev servers is they all have hooks to run code when the development server starts. These hooks exist in the form of build plugins (for example, tailwind v4 is a build plugin for vite).
+
+But, asking your user to manually configure the plugin is quite a large friction point for your tool, and leaves many opportunities for users to drop out of the onboarding flow. 
+
+The solution to this is to provide a single CLI command that automatically configures your tool in the users project. Of course, this is a bit hard, you need to generate an AST of the users configuration file, and handle transforming the file for every possible build tool the user might be using.
+
+This is a very big hurdle to jump through if you are just trying to make a simple web based tool, and kyju provides this functionality out of the box.
+
+After the user has configured your devtool's MCP server to run, you still need a way to communicate with the users website. Since kyju can run code on the MCP server, and the users website, it's trivial to make a web socket connection. Requesting any data for a tool call is as simple as sending a websocket message asking for the data.
+
+Because of this architecture, kyju can automatically spin up an MCP server for every devtool made, with minimal configuration needed to describe the input to the tool, and what it does.

@@ -34,6 +34,7 @@ export const articleNameMap = {
   "zenbu-devlog-5": "zenbu devlog #5",
   "zenbu-devlog-6": "zenbu devlog #6",
   "zenbu-devlog-7": "zenbu devlog #7",
+  "zenbu-devlog-8": "zenbu devlog #8",
 };
 
 // so bad lol
@@ -46,6 +47,7 @@ export const isDevlog: Record<string, boolean> = {
   "zenbu-devlog-5": true,
   "zenbu-devlog-6": true,
   "zenbu-devlog-7": true,
+  "zenbu-devlog-8": true,
 };
 export const descriptionMap: Record<string, string> = {
   "zenbu-devlog-intro": "what is zenbu",
@@ -56,6 +58,7 @@ export const descriptionMap: Record<string, string> = {
   "zenbu-devlog-5": "build by experimenting",
   "zenbu-devlog-6": "your software",
   "zenbu-devlog-7": "your empire",
+  "zenbu-devlog-8": "kyju- a library for building devtools",
 };
 
 export const BASE_URL =
@@ -74,6 +77,7 @@ export const showArticles = [
   "zenbu-devlog-5",
   "zenbu-devlog-6",
   "zenbu-devlog-7",
+  "zenbu-devlog-8",
 ];
 
 export const createdAtMap: Record<string, Date> = {
@@ -89,4 +93,5 @@ export const createdAtMap: Record<string, Date> = {
   "zenbu-devlog-5": new Date("2025-05-01"),
   "zenbu-devlog-6": new Date("2025-05-02"),
   "zenbu-devlog-7": new Date("2025-05-04"),
+  "zenbu-devlog-8": new Date("2025-05-20"),
 };

@@ -18,6 +18,7 @@ const WithCodeTabContent = ({
   name = "Code",
   resettable = true,
   replace = (x) => x,
+  language="tsx"
 }: {
   children?: React.ReactNode;
   filePath: string;
@@ -25,6 +26,7 @@ const WithCodeTabContent = ({
   noCheck?: boolean;
   resettable?: boolean;
   replace?: (content: string) => string;
+  language?: "tsx" | "python";
 }) => {
   return (
     <Tabs
@@ -56,10 +58,12 @@ export const FileCodeEditorContent = async ({
   filePath,
   noCheck = true,
   replace = (x) => x,
+  language = "tsx",
 }: {
   filePath: string;
   noCheck?: boolean;
   replace?: (content: string) => string;
+  language?: "tsx" | "python";
 }) => {
   const fileContent = await readFile(filePath, "utf-8");
 
@@ -68,6 +72,7 @@ export const FileCodeEditorContent = async ({
     : fileContent;
   return (
     <PrismEditor
+    language={language}
       code={replace(afterNoChecked.replace(`"use client";\n`, ""))}
     />
   );
@@ -77,6 +82,7 @@ export const SuspenseEditor = (props: {
   filePath: string;
   noCheck?: boolean;
   replace?: (content: string) => string;
+  language?: "tsx" | "python";
 }) => {
   return (
     <Suspense fallback={<Loader2 className="animate-spin" size={20} />}>

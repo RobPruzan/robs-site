@@ -3,13 +3,19 @@ import React, { useState } from "react";
 import Editor from "react-simple-code-editor";
 import { highlight, languages } from "prismjs";
 import "prismjs/components/prism-typescript";
-import "prismjs/themes/prism-dark.css"; 
+import "prismjs/themes/prism-dark.css";
 
 import "prismjs/components/prism-jsx";
 import "prismjs/components/prism-tsx";
 import { useTheme } from "next-themes";
 
-export const PrismEditor = ({ code }: { code: string }) => {
+export const PrismEditor = ({
+  code,
+  language = "tsx",
+}: {
+  code: string;
+  language?: "tsx" | "python";
+}) => {
   // const { theme } = useTheme();
 
   return (
@@ -24,7 +30,7 @@ export const PrismEditor = ({ code }: { code: string }) => {
         readOnly
         value={code}
         onValueChange={() => {}}
-        highlight={(code) => highlight(code, languages.tsx, "tsx")}
+        highlight={(code) => highlight(code, languages.tsx, language)}
         padding={10}
         style={
           {
