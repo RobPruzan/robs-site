@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { SuspenseEditor } from "../../../../lib/WithCodeTab.tsx";
 
-### What is kyju
+## What is [kyju](https://github.com/RobPruzan/kyju)
 
 Kyju is a JavaScript library for building web based devtools. Specifically, it solves:
 
@@ -157,7 +157,7 @@ But, we need the user to somehow run this server for us manually. We can't ask t
 
 Though, luckily, almost all modern apps use a dev server, which we can hook into. And one great property of dev servers is they all have hooks to run code when the development server starts. These hooks exist in the form of build plugins (for example, tailwind v4 is a build plugin for vite).
 
-But, asking your user to manually configure the plugin is quite a large friction point for your tool, and leaves many opportunities for users to drop out of the onboarding flow. 
+But, asking your user to manually configure the plugin is quite a large friction point for your tool, and leaves many opportunities for users to drop out of the onboarding flow.
 
 The solution to this is to provide a single CLI command that automatically configures your tool in the users project. Of course, this is a bit hard, you need to generate an AST of the users configuration file, and handle transforming the file for every possible build tool the user might be using.
 
