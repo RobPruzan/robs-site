@@ -1,0 +1,28 @@
+import Link from "next/link";
+import Image from "next/image";
+import { SuspenseEditor } from "../../../../lib/WithCodeTab.tsx";
+
+## a tool to build tools
+
+A core feature I feel strongly about is you should be able to extend the platform using LLMs. If you want a tool that would be super useful for your niche use case, you should be able to ask the app to change itself.
+
+In zenbu’s context, this means you can build devtools to help you “vibe code” better. That may be custom network panel for your framework, or a draw tool that lets you markup the screen which gets fed back to the model.
+
+This idea was working well enough that I wanted this everywhere in my workflow (editor, note taker).
+
+I started experimenting with zenbu as a vscode extension, since I would have the opportunity to use vscode API’s in the model generations. It ended up being a trivial port, and I was able to share all the code because of vscode webviews
+
+### zenbu inside of an extension
+
+<Image
+  src="/devlog/9/zenbu-extension.png"
+  alt="zenbu inside of an extension"
+  width={700}
+  height={400}
+/>
+
+The more I played around with this idea, the more I realized the editor is a much better environment for an “app generation” tool to exist. There is no “graduation” penalty you have to pay when you need to export the code from the platform.
+
+The biggest benefit though from colocating the “app generation” with the editor is that you can create tools for the editor, in the editor. All apps that run in a vscode webview can send and recv messages from the vscode api. Meaning these app generations are essentially extensions made on the fly.
+
+This is super powerful, since you can create comprehensive tooling for small projects for near 0 cost/time. This was enough to convince me to pivot the project to being primarily a vscode extension.
