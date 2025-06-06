@@ -25,7 +25,7 @@ export function Navbar() {
                 Rob Pruzan
               </h1>
               <p className="text-white/40 font-mono text-sm max-w-xl mt-4">
-                (soon) Next.js @vercel
+                Next.js @vercel
               </p>
             </div>
             <div className="flex items-center gap-6">
