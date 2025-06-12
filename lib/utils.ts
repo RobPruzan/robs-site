@@ -36,6 +36,7 @@ export const articleNameMap = {
   "zenbu-devlog-7": "zenbu devlog #7",
   "zenbu-devlog-8": "zenbu devlog #8",
   "zenbu-devlog-9": "zenbu devlog #9",
+  "session-replay-to-mp4-and-fast": "session replay to mp4, and fast",
 };
 
 // so bad lol
@@ -50,6 +51,7 @@ export const isDevlog: Record<string, boolean> = {
   "zenbu-devlog-7": true,
   "zenbu-devlog-8": true,
   "zenbu-devlog-9": true,
+
 };
 export const descriptionMap: Record<string, string> = {
   "zenbu-devlog-intro": "what is zenbu",
@@ -82,6 +84,7 @@ export const showArticles = [
   "zenbu-devlog-7",
   "zenbu-devlog-8",
   "zenbu-devlog-9",
+  "session-replay-to-mp4-and-fast",
 ];
 
 export const createdAtMap: Record<string, Date> = {
@@ -99,4 +102,5 @@ export const createdAtMap: Record<string, Date> = {
   "zenbu-devlog-7": new Date("2025-05-04"),
   "zenbu-devlog-8": new Date("2025-05-20"),
   "zenbu-devlog-9": new Date("2025-06-04"),
+  "session-replay-to-mp4-and-fast": new Date("2025-06-12"),
 };

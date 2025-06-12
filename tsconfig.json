@@ -35,7 +35,7 @@
     ".next/types/**/*.ts",
     "app/test.mdx",
     "app/blog/(articles)/proximity-chat/page.mdx"
-  ],
+, "app/blog/(articles)/session-replay-to-mp4/page.mdx"  ],
   "exclude": [
     "node_modules",
 

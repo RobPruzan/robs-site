@@ -1,0 +1,161 @@
+import Image from "next/image";
+import Link from "next/link";
+import { EstimatedReadTime } from "../../../../lib/EstimatedReadTime.tsx";
+
+import { SuspenseEditor } from "../../../../lib/WithCodeTab.tsx";
+
+# session replay to mp4, and fast
+
+Rob Pruzan 6/12/25
+
+<EstimatedReadTime path="./app/blog/(articles)/session-replay-to-mp4-and-fast/page.mdx" />
+
+First I want to quickly define what a session replay is on the web, since it's surprising it exists at all.
+
+If you want to record a users screen to understand how they use your website, you might try to use a browser API just gives you a recording of their screen. One of those does exist, it's called `navigator.mediaDevices.getDisplayMedia` and has the exact capabilities we need. But it has one big problem, you need to ask for permission before recording the users screen (reasonably?)
+
+<Image
+  src="/replay/dialog.png"
+  width="600"
+  height="600"
+  alt="permission dialog"
+/>
+
+But, almost no user will grant you permission to their screen for analytics purposes, and would raise questions why you are asking for that data. A logical next step from here is to give up on getting a full screen recording, the permission popup is a deal breaker.
+
+You definitely still want some data about how the user is using your website- like how frequently a feature is being used. So you track all interactions users make to your website. You may also be interested in the order users are using features, so you track the interactions as a sequence of events during the period they are using your website.
+
+`[{type: 'clicked', element: {...button info}, timestamp: '0:01}, ...]`
+
+Now that you have all this data, it would be nice to visualize it (how would you interpret a long stream of events for each user). One clever thing you can do is track the screen position of the elements interacted with, and the reconstruct a lower resolution version of the users session on your website. Then you can observe how the website changes over the course of the session.
+
+<Image
+  src="/replay/low-res.png"
+  alt="low res replay"
+  width={400}
+  height={200}
+/>
+
+The more data you collect, the higher resolution you can make the "lower resolution" replay- you can collect the color of the button clicked, the css about the page layout, the scroll position of the page, and then apply all that data to your fake version.
+
+As it turns out if you collect enough data you can reconstruct a replay thats about identical with what the user saw on the screen, all without asking for permission. Doing this without asking the user is a little questionable, but it's tough to draw a line between "collecting button clicks" and "reconstructing a pixel perfect replay of the users session", so nobody has drawn it (lol)
+
+Now that the context is out of the way, the problem we're trying to solve today is how to turn this array-of-user-events into an mp4. The conventional way to replay these events, in packages like [rrweb](https://github.com/rrweb-io/rrweb), is to make a website that updates according to the events. And there's no library that can re-encode these events into an mp4 directly, as you would have to write a spec compliant browser in such library to correctly render the content.
+
+So, we will have to replay the events the conventional way. With a browser, and then record the browser as it renders the website over time. This is not a very hard problem, you can use headless browsers, like [puppeteer](https://pptr.dev/), and then record the output and save to disk as an mp4. This is [the approach](https://github.com/rrweb-io/rrweb/blob/master/packages/rrvideo/README.md) provided by the most popular session replay library- rrweb.
+
+But, a very unfortunate property of this approach is that the time it takes to get the mp4 scales linearly with how long the session replay is. This means if the session was 30 minutes, it will take ~30 minutes to get the mp4.
+
+This is a huge problem if you need the mp4 immediately- for example, if you want to send a pair programming LLM a video of what's happening on your website. No LLM can accurately interpret session replays- as that would mean they must have a spec compliant browser encoded in their weights. It wouldn't be reasonable to ask the user to wait minutes for a video to be prepared, so we need a solution.
+
+As for any performance problem, it's helpful to visualize where time is being spent on during the routine:
+
+<Image
+  src="/replay/timeline.png"
+  alt="perf timeline"
+  width={400}
+  height={200}
+/>
+
+There are 2 potential paths here, make the bars smaller, or parallelize the work.
+
+It seems weird to say we want the user session to be smaller, so lets more visual the problem better
+
+<Image
+  src="/replay/formalized.png"
+  alt="perf timeline with record start marked"
+  width={400}
+  height={200}
+/>
+
+We need to minimize the time between when we start recording and when we get the recording.
+
+To do this, maybe we can replay the session at a higher playback speed, lets say 60x speed. That way a 1 minute session replay could be recorded in just a second. Assuming this was possible, you would still need to capture the browser screen output to turn it into an mp4. If you still want to maintain 30fps, that means you need to capture 1800fps. We aren't limited by our monitors refresh rate since we aren't drawing it to our actual screen, but we still need to go through the browser rendering pipeline, which will take on the order of milliseconds for any non trivial operation. This path likely will bear no fruit.
+
+So we can't make the green bar shorter, and we can't make the red bar short enough to meet our time budget. So next up, path 2- parallelization. The factor that decides whether you can parallelize something is if operations are independent of each other. So, lets try to break up a hypothetical replay into atomic tasks, and see which, if any, are independent
+
+<Image
+  src="/replay/split-up-tasks.png"
+  alt="split up tasks atomically"
+  width={400}
+  height={200}
+/>
+
+Now lets define which operations are dependent on each other
+
+<Image
+  src="/replay/dag.png"
+  alt="a dag of the tasks"
+  width={400}
+  height={200}
+/>
+
+To record any event, we need to wait for that event, and all previous events to happen. To not violate our dependency graph, we just need to make sure every dependency happens before our operation (recording an interaction up to a certain timestamp).
+
+We can't parallelize any "RECORD" tasks, as they are all dependent on the previous record task finishing, but we absolutely don't need to wait for the last user event (click button) to record the first. Or more generally, we don't need to wait for any future events to record what's already happened. This means we can just shift over all our recording tasks on the timeline without violating our dependency rule
+
+<Image
+  src="/replay/optimized-dag.png"
+  alt="an optimized dag of the tasks"
+  width={400}
+  height={200}
+/>
+
+That's a lot better, but lets confirm our algorithm [infinitely scales](https://bsky.app/profile/danabra.mov/post/3lpw5yr4ack23)- it runs in O(1) with respect to the session replay size. An easy way to do that is to double our session replay and observe how long our algorithm takes to execute
+
+<Image
+  src="/replay/longer-dag.png"
+  alt="session replay doubled in length"
+  width={400}
+  height={200}
+/>
+
+Since we only care about the time after we "Start Recording" we can definitely say the algorithm's execution time is unchanged, so it seems we have something we can work with.
+
+Now, for how to actually implement such a system.
+
+We need to receive events about the users session in real time for this to work- since we need to play the interactions on a remote browser and record it at the same time.
+
+If we are using [rrweb](https://www.rrweb.io/), we can just use their emit API to send events to our remote server
+
+<SuspenseEditor
+  noCheck
+  filePath="./app/blog/(articles)/session-replay-to-mp4-and-fast/snippets/1.tsx"
+/>
+
+Our remote server will be hosting a headless browser with an [rrweb replayer instance](https://github.com/rrweb-io/rrweb/tree/master/packages/replay) that can interpret these events.
+
+If we run the replayer with liveMode on, we just need to feed new events to the instance as they come in from the user:
+
+<SuspenseEditor
+  noCheck
+  filePath="./app/blog/(articles)/session-replay-to-mp4-and-fast/snippets/2.tsx"
+/>
+<SuspenseEditor
+  noCheck
+  filePath="./app/blog/(articles)/session-replay-to-mp4-and-fast/snippets/3.tsx"
+/>
+
+<Image
+  src="/replay/real-time.gif"
+  alt="a gif of the real time replay"
+  width={400}
+  height={200}
+/>
+
+Now we need to be able to incrementally record the browser window. One fool proof way is to just screenshot the page really really fast, collect the png's into an array, and when you need the video, use ffmpeg to convert the png's into an mp4. There also seems to also be a [puppeteer API](https://pptr.dev/api/puppeteer.page.screencast) to get a proper video stream from the browser that I haven't tried yet, but that should allow for higher frame rates vs screenshotting.
+
+### Show me the code
+
+If you want to start hacking around with this approach, here's a fully contained file of the implementation you can run with bun- https://github.com/RobPruzan/zenbu/blob/main/packages/zenbu-video/src/index.ts
+
+And a sample app that uses the server- https://github.com/RobPruzan/real-time-example
+
+And finally a demo of all that pieces together
+
+<Image
+  src="/replay/full-live.gif"
+  alt="a full demo of a real time recording"
+  width={400}
+  height={200}
+/>

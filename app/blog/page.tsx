@@ -9,6 +9,7 @@ import { BlogList } from "./BlogList";
 
 export default async function Page() {
   const directoryNames = await getDirectories("./app/blog/(articles)");
+  
 
   const articles = directoryNames
     .filter((name) => showArticles.includes(name) && !isDevlog[name])
