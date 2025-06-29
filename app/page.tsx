@@ -9,7 +9,7 @@ export default function Home() {
   const projects = [
     {
       title: "Zenbu",
-      description: "The ultimate devtool",
+      description: "Local first vibe coding client",
       longDescription:
         "A JavaScript package that injects a comprehensive set of devtools into a website",
       contributions: (
