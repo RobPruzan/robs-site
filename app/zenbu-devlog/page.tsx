@@ -38,7 +38,6 @@ export default async function ZenbuDevlogPage() {
             className="inline-flex items-center gap-1 text-white/60 hover:text-white/90 transition-colors font-mono text-sm"
           >
             <Github size={16} />
-            <span>View Zenbu on GitHub</span>
           </a>
         </div>
         {articles.map((article) => (
