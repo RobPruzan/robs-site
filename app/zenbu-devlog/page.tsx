@@ -30,7 +30,7 @@ export default async function ZenbuDevlogPage() {
   return (
     <div className="max-w-[1400px] mx-auto px-4 md:px-6 pb-3">
       <div className="space-y-12">
-        <div className="-mt-2 -mb-4">
+        {/* <div className="-mt-2 -mb-4">
           <a
             href="https://github.com/RobPruzan/zenbu"
             target="_blank"
@@ -39,7 +39,7 @@ export default async function ZenbuDevlogPage() {
           >
             <Github size={16} />
           </a>
-        </div>
+        </div> */}
         {articles.map((article) => (
           <a
             key={article.name}
