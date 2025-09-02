@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import { unstable_cache } from "next/cache";
 
 interface SearchMatch {
   text: string;
@@ -39,6 +40,45 @@ function searchInFile(content: string, query: string): SearchMatch[] {
   return matches;
 }
 
+// Cache article content reading with 2 hour revalidation
+const getCachedArticleContent = unstable_cache(
+  async (mdxPath: string) => {
+    try {
+      const content = fs.readFileSync(mdxPath, 'utf-8');
+      const { data, content: mdxContent } = matter(content);
+      return { data, mdxContent };
+    } catch (error) {
+      console.error(`Error reading ${mdxPath}:`, error);
+      return null;
+    }
+  },
+  ['article-content'],
+  {
+    revalidate: 7200, // 2 hours in seconds
+    tags: ['articles']
+  }
+);
+
+// Cache directory listing with 2 hour revalidation
+const getCachedArticleDirs = unstable_cache(
+  async () => {
+    const blogDir = path.join(process.cwd(), 'app/blog/(articles)');
+    try {
+      return fs.readdirSync(blogDir, { withFileTypes: true })
+        .filter(dirent => dirent.isDirectory())
+        .map(dirent => dirent.name);
+    } catch (error) {
+      console.error('Error reading blog directory:', error);
+      return [];
+    }
+  },
+  ['article-dirs'],
+  {
+    revalidate: 7200, // 2 hours in seconds
+    tags: ['articles']
+  }
+);
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const query = searchParams.get('q');
@@ -51,22 +91,22 @@ export async function GET(request: NextRequest) {
   
   const stream = new ReadableStream({
     async start(controller) {
-      const blogDir = path.join(process.cwd(), 'app/blog/(articles)');
-      
       try {
-        const articleDirs = fs.readdirSync(blogDir, { withFileTypes: true })
-          .filter(dirent => dirent.isDirectory())
-          .map(dirent => dirent.name);
+        // Get cached article directories
+        const articleDirs = await getCachedArticleDirs();
         
         // Stream results as we find them
         for (const dir of articleDirs) {
-          const articlePath = path.join(blogDir, dir);
+          const articlePath = path.join(process.cwd(), 'app/blog/(articles)', dir);
           const mdxPath = path.join(articlePath, 'page.mdx');
           
+          // Check if file exists before trying to read
           if (fs.existsSync(mdxPath)) {
-            try {
-              const content = fs.readFileSync(mdxPath, 'utf-8');
-              const { data, content: mdxContent } = matter(content);
+            // Get cached article content
+            const articleData = await getCachedArticleContent(mdxPath);
+            
+            if (articleData) {
+              const { data, mdxContent } = articleData;
               
               // Search in content
               const matches = searchInFile(mdxContent, query);
@@ -81,7 +121,7 @@ export async function GET(request: NextRequest) {
                   title: data.title || dir,
                   slug: dir,
                   type: isBrain ? "brain" : "blog",
-                  matches: matches.slice(0, 5),
+                  matches: matches, // Return all matches, no limit
                   matchCount: matches.length
                 };
                 
@@ -89,8 +129,6 @@ export async function GET(request: NextRequest) {
                 const data_str = `data: ${JSON.stringify(result)}\n\n`;
                 controller.enqueue(encoder.encode(data_str));
               }
-            } catch (error) {
-              console.error(`Error reading ${mdxPath}:`, error);
             }
           }
         }
@@ -99,7 +137,7 @@ export async function GET(request: NextRequest) {
         controller.enqueue(encoder.encode('data: [DONE]\n\n'));
         controller.close();
       } catch (error) {
-        console.error('Error reading blog directory:', error);
+        console.error('Error in search stream:', error);
         controller.error(error);
       }
     },

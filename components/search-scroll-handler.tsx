@@ -17,7 +17,7 @@ export function SearchScrollHandler() {
     if (scrollTargetStr) {
       try {
         const scrollTarget = JSON.parse(scrollTargetStr);
-        const { query, text } = scrollTarget;
+        const { query, text, lineNumber, fullContext, beforeContext, afterContext } = scrollTarget;
         
         // Clear the storage so we don't scroll again on refresh
         sessionStorage.removeItem('searchScrollTarget');
@@ -34,8 +34,8 @@ export function SearchScrollHandler() {
             const article = document.querySelector('article');
             if (!article) return;
             
-            // Function to find text in DOM
-            const findAndScrollToText = (searchText: string) => {
+            // Function to find text in DOM with context matching
+            const findAndScrollToText = (searchText: string, useContext: boolean = false) => {
               const walker = document.createTreeWalker(
                 article,
                 NodeFilter.SHOW_TEXT,
@@ -52,6 +52,10 @@ export function SearchScrollHandler() {
               );
               
               let node;
+              let matchCount = 0;
+              const allMatches: { node: Node; index: number; parent: Element }[] = [];
+              
+              // First, collect all potential matches
               while (node = walker.nextNode()) {
                 const nodeText = node.textContent || '';
                 const searchLower = searchText.toLowerCase();
@@ -59,54 +63,77 @@ export function SearchScrollHandler() {
                 
                 // Check if this text node contains our search text
                 if (nodeLower.includes(searchLower)) {
-                  // Create a temporary span to wrap the matching text
                   const parent = node.parentElement;
                   if (parent) {
-                    // Find the exact position of the match
                     const matchIndex = nodeLower.indexOf(searchLower);
-                    
-                    // Split the text node
-                    const beforeText = nodeText.substring(0, matchIndex);
-                    const matchText = nodeText.substring(matchIndex, matchIndex + searchText.length);
-                    const afterText = nodeText.substring(matchIndex + searchText.length);
-                    
-                    // Create new nodes
-                    const beforeNode = document.createTextNode(beforeText);
-                    const matchSpan = document.createElement('span');
-                    matchSpan.textContent = matchText;
-                    matchSpan.style.backgroundColor = 'rgba(250, 204, 21, 0.3)'; // yellow-400 with opacity
-                    matchSpan.style.color = 'rgb(250, 204, 21)'; // yellow-400
-                    matchSpan.style.fontWeight = 'bold';
-                    matchSpan.id = 'search-scroll-target';
-                    
-                    const afterNode = document.createTextNode(afterText);
-                    
-                    // Replace the original text node
-                    parent.replaceChild(afterNode, node);
-                    parent.insertBefore(matchSpan, afterNode);
-                    if (beforeText) {
-                      parent.insertBefore(beforeNode, matchSpan);
-                    }
-                    
-                    // Force immediate scroll without animation
-                    const rect = matchSpan.getBoundingClientRect();
-                    const absoluteTop = rect.top + window.pageYOffset;
-                    
-                    // Scroll instantly with offset for header
-                    window.scrollTo(0, absoluteTop - 100);
-                    
-                    return true;
+                    allMatches.push({ node, index: matchIndex, parent });
                   }
                 }
+              }
+              
+              // If we have context, try to find the best match
+              let targetMatch = allMatches[0]; // Default to first match
+              
+              if (useContext && beforeContext && afterContext && allMatches.length > 1) {
+                // Try to find the match with the right context
+                for (const match of allMatches) {
+                  const parent = match.parent;
+                  const parentText = parent.textContent || '';
+                  
+                  // Check if the surrounding context matches
+                  if (parentText.includes(beforeContext) || parentText.includes(afterContext)) {
+                    targetMatch = match;
+                    break;
+                  }
+                }
+              }
+              
+              // Apply highlighting to the selected match
+              if (targetMatch) {
+                const { node, index, parent } = targetMatch;
+                const nodeText = node.textContent || '';
+                const matchIndex = index;
+                
+                // Split the text node
+                const beforeText = nodeText.substring(0, matchIndex);
+                const matchText = nodeText.substring(matchIndex, matchIndex + searchText.length);
+                const afterText = nodeText.substring(matchIndex + searchText.length);
+                
+                // Create new nodes
+                const beforeNode = document.createTextNode(beforeText);
+                const matchSpan = document.createElement('span');
+                matchSpan.textContent = matchText;
+                matchSpan.style.backgroundColor = 'rgba(250, 204, 21, 0.3)'; // yellow-400 with opacity
+                matchSpan.style.color = 'rgb(250, 204, 21)'; // yellow-400
+                matchSpan.style.fontWeight = 'bold';
+                matchSpan.id = 'search-scroll-target';
+                
+                const afterNode = document.createTextNode(afterText);
+                
+                // Replace the original text node
+                parent.replaceChild(afterNode, node);
+                parent.insertBefore(matchSpan, afterNode);
+                if (beforeText) {
+                  parent.insertBefore(beforeNode, matchSpan);
+                }
+                
+                // Force immediate scroll without animation
+                const rect = matchSpan.getBoundingClientRect();
+                const absoluteTop = rect.top + window.pageYOffset;
+                
+                // Scroll instantly with offset for header
+                window.scrollTo(0, absoluteTop - 100);
+                
+                return true;
               }
               
               return false;
             };
             
-            // Try to find exact text first
-            if (!findAndScrollToText(text)) {
+            // Try to find exact text first with context
+            if (!findAndScrollToText(text, true)) {
               // If not found, try with just the query
-              findAndScrollToText(query);
+              findAndScrollToText(query, false);
             }
             
             // Re-enable scroll restoration after scrolling

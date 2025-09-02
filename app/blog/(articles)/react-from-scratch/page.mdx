@@ -82,7 +82,7 @@ But, if we want to start rendering functional components, and composing differen
 
 {/* ![image.png](Implementing%20React%20From%20Scratch%202d86940fe51c4cb4b1f6906cec5a6850/image.png) */}
 
-<Image src="/react-from-scratch/image.png" height="450" width="450" />
+<Image src="/react-from-scratch/image.png" height="450" width="450" alt="React component tree with eagerly and lazily evaluated nodes" />
 
 Where every function needs to be manually executed to evaluate the rest of the tree.
 
@@ -202,13 +202,13 @@ But, for the following code, what do we expect the parent-child relationship to 
 
 Another way to ask that question is, if `ComponentA` re-renders, should `ComponentB` re-render? Lets take a look at what our current view tree would look like:
 
-<Image src="/react-from-scratch/image-1.png" height="300" width="200" />
+<Image src="/react-from-scratch/image-1.png" height="300" width="200" alt="Component tree structure visualization" />
 
 This implies that `ComponentA` re-rendering **should** re-render `ComponentB`. But does it need to? `ComponentB` will never accept any props from `ComponentA`, as it was created in `App`.
 
 If we say that the possibility of a component accepting props from another component creates a dependency between the 2 components, a dependency tree for the above react app would look like:
 
-<Image src="/react-from-scratch/image-2.png" height="450" width="450" />
+<Image src="/react-from-scratch/image-2.png" height="450" width="450" alt="Virtual DOM reconciliation process diagram" />
 
 > Note, in my actual code on GitHub I refer to the dependency tree as the "RenderTree"
 
@@ -236,7 +236,7 @@ Using this strategy, we can build the dependency tree we were looking for. Howev
 
 We will need to use this dependency tree as we traverse the lazy tree returned by a component:
 
-<Image src="/react-from-scratch/image-3.png" height="450" width="450" />
+<Image src="/react-from-scratch/image-3.png" height="450" width="450" alt="Component rendering flow diagram" />
 
 A simple way we can use the dependency tree is as we are generating the view tree, only re-render a component if it depends on the component that triggered the re-render (or if it's never been rendered before)
 
@@ -253,7 +253,7 @@ between renders is very wrong!
 
 Previously, to make sure state is not lost between re-renders, we just copied the state over for only the component that triggered the re-render
 
-<Image src="/react-from-scratch/image-4.png" height="450" width="450" />
+<Image src="/react-from-scratch/image-4.png" height="450" width="450" alt="State management and updates flow" />
 
 But what about every other component? They will all have re-initialized states, remembering nothing from the previous re-render.
 
@@ -263,15 +263,15 @@ What we have to do is determine equality between the 2 trees for every node in t
 
 Lets see how we can do this as a human. For the following example, how would you determine equality between nodes, if you had to make a decision:
 
-<Image src="/react-from-scratch/image-5.png" height="450" width="450" />
+<Image src="/react-from-scratch/image-5.png" height="450" width="450" alt="Event handling and propagation diagram" />
 
 I think the answer is pretty easy here: just match the nodes in the same position:
 
-<Image src="/react-from-scratch/image-6.png" height="450" width="450" />
+<Image src="/react-from-scratch/image-6.png" height="450" width="450" alt="Component lifecycle and re-rendering visualization" />
 
 And how do we programmatically define position? We can just say the path to get to the node
 
-<Image src="/react-from-scratch/image-7.png" height="450" width="450" />
+<Image src="/react-from-scratch/image-7.png" height="450" width="450" alt="Props flow and component communication" />
 
 When a node has the same index path between view trees, we can transfer over the state from the previous tree. If there's a new path we can't map (implying its a new node), we don't transfer any state over and let it initialize itself.
 
@@ -303,7 +303,7 @@ The simplest solution would be to filter out all `false | null | undefined` valu
 
 But we cannot do that. Imagine the following trees generated between 2 renders, where the node at path [0] is conditionally rendered:
 
-<Image src="/react-from-scratch/image-8.png" height="450" width="450" />
+<Image src="/react-from-scratch/image-8.png" height="450" width="450" alt="Re-rendering optimization strategies" />
 
 If, in the second render, [0] was replaced with `false | undefined | null`, we could omit to create a node for it. But then the node at [1] would slip back to position [0], making it look like it was the [0]'th node, and the same goes for its children.
 
@@ -311,7 +311,7 @@ But that would obviously be wrong, and would mean we would have to require keys 
 
 Instead, we could represent `false | undefined | null` as an empty slot in our tree. Where `false | null | undefined` create valid react elements to place on the tree. They just have no metadata and no children. This way, our tree will be stable between renders:
 
-<Image src="/react-from-scratch/image-9.png" height="450" width="450" />
+<Image src="/react-from-scratch/image-9.png" height="450" width="450" alt="React hooks implementation architecture" />
 
 Anytime we attempt to render an empty slot, we just skip it. It has no children and cannot output anything. All our nodes still exist in the same position, so we can correctly transfer state between renders.
 
@@ -407,7 +407,7 @@ This means if your function does more computation than the computation required 
 
 This was also proven at scale with the react compiler- a compiler that memoizes basically everything. They applied it to the Instagram codebase and saw no increases in memory and huge improvements to to interactivity:
 
-<Image src="/react-from-scratch/image-10.png" height="450" width="450" />
+<Image src="/react-from-scratch/image-10.png" height="450" width="450" alt="Final React implementation architecture overview" />
 
 <h3 id="usecallback">useCallback</h3>
 
@@ -488,7 +488,7 @@ Lets finally see an example of all of it put together!
 
 The below example shows off a sample app with context, state, memoization, fetching in useEffects, conditional rendering, list rendering, deep props, and efficient dom updates!
 
-<Image src="/react-from-scratch/demo.gif" height="600" width="600" />
+<Image src="/react-from-scratch/demo.gif" height="600" width="600" alt="Demo showing the custom React implementation in action" />
 
 <h2 id="conclusion">Conclusion</h2>
 

@@ -122,7 +122,7 @@ export const WithMultiCodeTabContent = ({
       >
         {children && <TabsTrigger value="canvas">Canvas</TabsTrigger>}
         {filePaths.map(({ name }) => (
-          <TabsTrigger value={name}>{name}</TabsTrigger>
+          <TabsTrigger key={name} value={name}>{name}</TabsTrigger>
         ))}
       </TabsList>
       {resettable ? (
@@ -132,7 +132,7 @@ export const WithMultiCodeTabContent = ({
       )}
 
       {filePaths.map(({ name, path }) => (
-        <TabsContent value={name}>
+        <TabsContent key={name} value={name}>
           <FileCodeEditor replace={replace} filePath={path} />
         </TabsContent>
       ))}
