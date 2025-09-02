@@ -1,10 +1,6 @@
 {
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -22,9 +18,7 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"]
     },
     "target": "ES2017"
   },
@@ -36,10 +30,7 @@
     "app/blog/(articles)/session-replay-to-mp4/page.mdx",
     "app/test.mdx",
     "next-env.d.ts",
-    ".next-prod/types/**/*.ts"
+    ".next/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "**/snippet/**"
-  ]
+  "exclude": ["node_modules", "**/snippet/**"]
 }

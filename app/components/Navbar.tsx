@@ -1,12 +1,15 @@
 "use client";
 
-import { Github, Linkedin, Twitter } from "lucide-react";
+import { Github, Linkedin, Twitter, Search } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { isDevlog } from "@/lib/utils";
+import { useState, useEffect } from "react";
+import { SearchFold } from "@/components/search-fold";
 
 export function Navbar() {
   const pathname = usePathname();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   // Check if current path is a devlog article
   const isDevlogArticle =
@@ -14,6 +17,23 @@ export function Navbar() {
     Object.keys(isDevlog).some(
       (slug) => pathname === `/blog/${slug}` && isDevlog[slug]
     );
+
+  // Handle keyboard shortcuts (Cmd+K or /)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setIsSearchOpen(true);
+      } else if (e.key === "/" && !isSearchOpen && 
+                 !(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) {
+        e.preventDefault();
+        setIsSearchOpen(true);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isSearchOpen]);
 
   return (
     <div className="w-full">
@@ -63,11 +83,20 @@ export function Navbar() {
                 </Link>
               </nav>
               <div className="flex gap-4 items-center">
+                <button
+                  onClick={() => setIsSearchOpen(!isSearchOpen)}
+                  className={
+                    isSearchOpen ? "text-white/90" : "text-white/40 hover:text-white/60"
+                  }
+                  title="Search (⌘K or /)"
+                >
+                  <Search size={20} />
+                </button>
                 <a
                   href="https://github.com/RobPruzan"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-white/40 hover:text-white/60 transition-colors"
+                  className="text-white/40 hover:text-white/60"
                 >
                   <Github size={20} />
                 </a>
@@ -75,7 +104,7 @@ export function Navbar() {
                   href="https://x.com/RobKnight__"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-white/40 hover:text-white/60 transition-colors"
+                  className="text-white/40 hover:text-white/60"
                 >
                   <Twitter size={20} />
                 </a>
@@ -83,7 +112,7 @@ export function Navbar() {
                   href="https://www.linkedin.com/in/robert-pruzan/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-white/40 hover:text-white/60 transition-colors"
+                  className="text-white/40 hover:text-white/60"
                 >
                   <Linkedin size={20} />
                 </a>
@@ -92,6 +121,7 @@ export function Navbar() {
           </div>
         </div>
       </div>
+      <SearchFold isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </div>
   );
 }

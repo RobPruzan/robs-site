@@ -9,6 +9,8 @@ import {
 } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useCallback } from "react";
+import { RefreshCw } from "lucide-react";
 
 export const MoreArticles = ({
   directoryNames,
@@ -17,22 +19,66 @@ export const MoreArticles = ({
 }) => {
   const pathname = usePathname();
   const exclude = pathname.split("/").at(-1)!;
+  const [shuffleSeed, setShuffleSeed] = useState(0);
+  const [displayCount, setDisplayCount] = useState(6);
   
-  const filteredArticles = directoryNames
-    .filter((name) => showArticles.includes(name) && name !== exclude)
-    .sort((a, b) => {
-      const aDate = createdAtMap[a];
-      const bDate = createdAtMap[b];
-      return bDate.getTime() - aDate.getTime();
-    })
-    .slice(0, 6); // Show max 6 articles for cleaner layout
+  // Shuffle function with seed for consistency
+  const shuffleArray = useCallback((array: string[], seed: number) => {
+    const shuffled = [...array];
+    let currentIndex = shuffled.length;
+    
+    // Use seed to generate consistent random numbers
+    const random = (i: number) => {
+      const x = Math.sin(seed + i) * 10000;
+      return x - Math.floor(x);
+    };
+    
+    while (currentIndex !== 0) {
+      const randomIndex = Math.floor(random(currentIndex) * currentIndex);
+      currentIndex--;
+      [shuffled[currentIndex], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[currentIndex]];
+    }
+    
+    return shuffled;
+  }, []);
+  
+  const handleRefresh = () => {
+    setShuffleSeed(prev => prev + 1);
+    setDisplayCount(6); // Reset to initial count on shuffle
+  };
+  
+  const handleLoadMore = () => {
+    setDisplayCount(prev => prev + 6);
+  };
+  
+  const allFilteredArticles = directoryNames
+    .filter((name) => showArticles.includes(name) && name !== exclude);
+  
+  const sortedOrShuffled = shuffleSeed === 0 
+    ? allFilteredArticles.sort((a, b) => {
+        const aDate = createdAtMap[a];
+        const bDate = createdAtMap[b];
+        return bDate.getTime() - aDate.getTime();
+      })
+    : shuffleArray(allFilteredArticles, shuffleSeed);
+  
+  const filteredArticles = sortedOrShuffled.slice(0, displayCount);
   
   return (
     <div className="w-full mt-16 mx-auto max-w-none md:max-w-3xl">
       <div className="border-t border-border pt-8">
-        <h2 className="text-xl font-semibold mb-6 text-foreground">
-          More articles
-        </h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold text-foreground">
+            More articles
+          </h2>
+          <button
+            onClick={handleRefresh}
+            className="text-muted-foreground hover:text-foreground p-2 rounded-lg hover:bg-secondary/20"
+            title="Shuffle articles"
+          >
+            <RefreshCw size={16} />
+          </button>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredArticles.map((name, index) => {
             const title = name.includes("devlog")
@@ -70,15 +116,21 @@ export const MoreArticles = ({
             );
           })}
         </div>
-        {directoryNames.filter((name) => showArticles.includes(name) && name !== exclude).length > 6 && (
+        {sortedOrShuffled.length > displayCount && (
           <div className="mt-6 text-center">
-            <Link 
-              href="/blog" 
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            <button 
+              onClick={handleLoadMore}
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
             >
-              View all articles
-              <span aria-hidden="true">→</span>
-            </Link>
+              Load more ({sortedOrShuffled.length - displayCount} remaining)
+            </button>
+          </div>
+        )}
+        {displayCount >= sortedOrShuffled.length && sortedOrShuffled.length > 6 && (
+          <div className="mt-6 text-center">
+            <span className="text-sm text-muted-foreground">
+              All {sortedOrShuffled.length} articles shown
+            </span>
           </div>
         )}
       </div>

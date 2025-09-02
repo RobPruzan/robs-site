@@ -11,7 +11,6 @@ const withMDX = createMDX({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   pageExtensions: ["js", "jsx", "ts", "tsx", "md", "mdx"],
-  distDir: ".next-prod",
   experimental: {
     browserDebugInfoInTerminal: true,
     // mdxRs: false,
