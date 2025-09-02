@@ -246,7 +246,7 @@ export function SearchFold({ isOpen, onClose }: { isOpen: boolean; onClose: () =
           </div>
 
           {/* Results */}
-          <div className="max-h-[60vh] overflow-y-auto mt-4">
+          <div className="max-h-[60vh] overflow-y-auto overflow-x-hidden mt-4">
             {/* Show results as they stream in */}
             {results.map((result, index) => {
               const isExpanded = expandedResults.has(result.slug);
@@ -263,14 +263,14 @@ export function SearchFold({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                       className="flex items-center justify-between cursor-pointer hover:bg-white/[0.02] -mx-2 px-2 py-1 rounded"
                       onClick={() => toggleExpanded(result.slug)}
                     >
-                      <div className="flex items-center gap-2 flex-1">
-                        <span className="text-white/40">
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <span className="text-white/40 flex-shrink-0">
                           {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                         </span>
-                        <h3 className="text-white/80 font-mono text-sm">
+                        <h3 className="text-white/80 font-mono text-sm truncate">
                           {highlightMatch(result.title, query)}
                         </h3>
-                        <span className={`text-xs font-mono px-1.5 py-0.5 rounded ${
+                        <span className={`text-xs font-mono px-1.5 py-0.5 rounded flex-shrink-0 ${
                           result.type === "brain" 
                             ? "bg-purple-500/20 text-purple-300" 
                             : "bg-blue-500/20 text-blue-300"
@@ -278,7 +278,7 @@ export function SearchFold({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                           {result.type}
                         </span>
                       </div>
-                      <span className="text-white/30 text-xs font-mono">
+                      <span className="text-white/30 text-xs font-mono flex-shrink-0">
                         {result.matchCount} match{result.matchCount !== 1 ? 'es' : ''}
                       </span>
                     </div>
@@ -306,7 +306,7 @@ export function SearchFold({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                         )}
                         
                         {/* Match list */}
-                        <div className={`space-y-2 ${showAllMatches.has(result.slug) ? 'max-h-[300px] overflow-y-auto border border-white/10 rounded-lg p-2 bg-white/[0.02]' : ''}`}>
+                        <div className={`space-y-2 ${showAllMatches.has(result.slug) ? 'max-h-[300px] overflow-y-auto overflow-x-hidden border border-white/10 rounded-lg p-2 bg-white/[0.02]' : ''}`}>
                           {filteredMatches.length === 0 ? (
                             <div className="text-white/30 text-xs font-mono py-2">
                               No matches found for filter
@@ -349,7 +349,7 @@ export function SearchFold({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                               >
                                 <div className="text-xs font-mono">
                                   <div className="text-white/30 mb-1">Line {match.lineNumber}</div>
-                                  <div className="text-white/50 leading-relaxed">
+                                  <div className="text-white/50 leading-relaxed break-words overflow-wrap-anywhere">
                                     {(() => {
                                       const context = match.context;
                                       // Clean up MDX/markdown syntax
