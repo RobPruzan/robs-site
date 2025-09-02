@@ -13,7 +13,7 @@ export function BackButton() {
   const isZenbuDevlog = slug ? isDevlog[slug] : false;
 
   return (
-    <div className="flex items-center gap-4 mb-8 absolute top-0">
+    <div className="flex items-center gap-4 mb-8 absolute top-2 md:top-0">
       <Link href={isZenbuDevlog ? "/zenbu-devlog" : "/blog"} className="">
         <ArrowLeft size={20} />
       </Link>
