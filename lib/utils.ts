@@ -37,6 +37,7 @@ export const articleNameMap = {
   "zenbu-devlog-8": "zenbu devlog #8",
   "zenbu-devlog-9": "zenbu devlog #9",
   "session-replay-to-mp4-and-fast": "session replay to mp4, and fast",
+  "too-convinient": "too convinient",
   "hello": "hello",
   "testingng": "testingng",
   "testing": "testing",
@@ -91,7 +92,7 @@ export const showArticles = [
   "zenbu-devlog-8",
   "zenbu-devlog-9",
   "session-replay-to-mp4-and-fast",
-  "hello"
+  "too-convinient"
 ];
 
 export const createdAtMap: Record<string, Date> = {
@@ -110,6 +111,7 @@ export const createdAtMap: Record<string, Date> = {
   "zenbu-devlog-8": new Date("2025-05-20"),
   "zenbu-devlog-9": new Date("2025-06-04"),
   "session-replay-to-mp4-and-fast": new Date("2025-06-12"),
+  "too-convinient": new Date("2025-09-02"),
   "hello": new Date("2025-08-29"),
   "testingng": new Date("2025-08-27"),
   "testing": new Date("2025-08-27"),

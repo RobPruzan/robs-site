@@ -17,35 +17,71 @@ export const MoreArticles = ({
 }) => {
   const pathname = usePathname();
   const exclude = pathname.split("/").at(-1)!;
+  
+  const filteredArticles = directoryNames
+    .filter((name) => showArticles.includes(name) && name !== exclude)
+    .sort((a, b) => {
+      const aDate = createdAtMap[a];
+      const bDate = createdAtMap[b];
+      return bDate.getTime() - aDate.getTime();
+    })
+    .slice(0, 6); // Show max 6 articles for cleaner layout
+  
   return (
-    <div className="w-full border-t border-muted-foreground mt-10 gap-y-3 flex flex-col">
-      <h2 className="mt-2">More articles</h2>
-      {directoryNames
-        .filter((name) => showArticles.includes(name) && name !== exclude)
-        .sort((a, b) => {
-          const aDate = createdAtMap[a];
-          const bDate = createdAtMap[b];
-          return bDate.getTime() - aDate.getTime();
-        })
-        .map((name) => (
-          <div
-            key={name}
-            className="flex items-center gap-x-1 w-full justify-between"
-          >
-            <div className="flex gap-x-4">
-              -
+    <div className="w-full mt-16 mx-auto max-w-none md:max-w-3xl">
+      <div className="border-t border-border pt-8">
+        <h2 className="text-xl font-semibold mb-6 text-foreground">
+          More articles
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {filteredArticles.map((name, index) => {
+            const title = name.includes("devlog")
+              ? descriptionMap[name]
+              : articleNameMap[name as keyof typeof articleNameMap] ?? name;
+            const date = createdAtMap[name];
+            
+            return (
               <Link
-                className="underline underline-offset-4"
+                key={name}
                 href={`/blog/${name}`}
+                className="group relative p-4 rounded-lg border border-border/50 hover:border-border bg-background hover:bg-secondary/20 transition-all duration-200"
               >
-                {name.includes("devlog")
-                  ? descriptionMap[name]
-                  : articleNameMap[name as keyof typeof articleNameMap] ?? name}
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-start justify-between gap-3">
+                    <h3 className="text-base font-medium text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                      {title}
+                    </h3>
+                    <span className="text-xs text-muted-foreground whitespace-nowrap mt-1">
+                      {date.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric',
+                        year: date.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
+                      })}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">
+                      Read article →
+                    </span>
+                  </div>
+                </div>
+                <div className="absolute inset-0 rounded-lg ring-1 ring-inset ring-primary/0 group-hover:ring-primary/10 transition-all duration-200" />
               </Link>
-            </div>
-            <span>{createdAtMap[name].toLocaleDateString()}</span>
+            );
+          })}
+        </div>
+        {directoryNames.filter((name) => showArticles.includes(name) && name !== exclude).length > 6 && (
+          <div className="mt-6 text-center">
+            <Link 
+              href="/blog" 
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              View all articles
+              <span aria-hidden="true">→</span>
+            </Link>
           </div>
-        ))}
+        )}
+      </div>
     </div>
   );
 };

@@ -37,7 +37,7 @@ export default function RootLayout({
             url="https://monitoring.react-scan.com/api/v1/ingest"
           /> */}
         {process.env.NODE_ENV === "development" ? (
-          <UIWrapper enabled={true}>
+          <UIWrapper enabled={false}>
             <ThemeProvider
               attribute="class"
               defaultTheme="dark"
