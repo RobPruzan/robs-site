@@ -19,6 +19,7 @@ export function SearchScrollHandler() {
     const fullContext = urlParams.get('context');
     const beforeContext = urlParams.get('before');
     const afterContext = urlParams.get('after');
+    const matchIndex = parseInt(urlParams.get('idx') || '0', 10); // Get which match was clicked
     
     if (query && text) {
       try {
@@ -36,7 +37,7 @@ export function SearchScrollHandler() {
             if (!article) return;
             
             // Function to find text in DOM with context matching
-            const findAndScrollToText = (searchText: string, useContext: boolean = false) => {
+            const findAndScrollToText = (searchText: string, targetMatchIndex: number = 0) => {
               const walker = document.createTreeWalker(
                 article,
                 NodeFilter.SHOW_TEXT,
@@ -53,7 +54,7 @@ export function SearchScrollHandler() {
               );
               
               let node;
-              let matchCount = 0;
+              let currentMatchIndex = 0;
               const allMatches: { node: Node; index: number; parent: Element }[] = [];
               
               // First, collect all potential matches
@@ -62,22 +63,25 @@ export function SearchScrollHandler() {
                 const searchLower = searchText.toLowerCase();
                 const nodeLower = nodeText.toLowerCase();
                 
-                // Check if this text node contains our search text
-                if (nodeLower.includes(searchLower)) {
+                // Check all occurrences in this text node
+                let searchIndex = 0;
+                while ((searchIndex = nodeLower.indexOf(searchLower, searchIndex)) !== -1) {
                   const parent = node.parentElement;
                   if (parent) {
-                    const matchIndex = nodeLower.indexOf(searchLower);
-                    allMatches.push({ node, index: matchIndex, parent });
+                    allMatches.push({ node, index: searchIndex, parent });
                   }
+                  searchIndex += searchLower.length;
                 }
               }
               
-              // If we have context, try to find the best match
-              let targetMatch = allMatches[0]; // Default to first match
+              // Select the match at the target index
+              let targetMatch = allMatches[targetMatchIndex];
               
-              if (useContext && beforeContext && afterContext && allMatches.length > 1) {
+              // If the exact index doesn't exist, try to match by context
+              if (!targetMatch && beforeContext && afterContext && allMatches.length > 0) {
                 // Try to find the match with the right context
-                for (const match of allMatches) {
+                for (let i = 0; i < allMatches.length; i++) {
+                  const match = allMatches[i];
                   const parent = match.parent;
                   const parentText = parent.textContent || '';
                   
@@ -87,6 +91,11 @@ export function SearchScrollHandler() {
                     break;
                   }
                 }
+              }
+              
+              // Fallback to the first match if nothing else works
+              if (!targetMatch && allMatches.length > 0) {
+                targetMatch = allMatches[0];
               }
               
               // Apply highlighting to the selected match
@@ -131,10 +140,10 @@ export function SearchScrollHandler() {
               return false;
             };
             
-            // Try to find exact text first with context
-            if (!findAndScrollToText(text, true)) {
-              // If not found, try with just the query
-              findAndScrollToText(query, false);
+            // Try to find exact text first with the specific match index
+            if (!findAndScrollToText(text, matchIndex)) {
+              // If not found, try with just the query at the same index
+              findAndScrollToText(query, matchIndex);
             }
             
             // Re-enable scroll restoration after scrolling
@@ -143,10 +152,8 @@ export function SearchScrollHandler() {
                 window.history.scrollRestoration = 'auto';
               }
               
-              // Clean up URL params after scrolling to keep URL clean
-              // But preserve the path
-              const cleanUrl = window.location.pathname;
-              window.history.replaceState({}, '', cleanUrl);
+              // DON'T clean up URL params - keep them for shareability
+              // The URL with params is what makes the link shareable
             }, 50);
           });
         });
