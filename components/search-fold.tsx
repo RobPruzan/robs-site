@@ -322,24 +322,27 @@ export function SearchFold({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                                   {matchesToShow.map((match, matchIdx) => (
                               <Link
                                 key={matchIdx}
-                                href={`/blog/${result.slug}`}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  // Store the specific match for scrolling with full context
+                                href={(() => {
+                                  // Build URL with search params for shareable links
                                   const lines = match.context.split('\n');
                                   const matchingLine = lines.find(line => 
                                     line.toLowerCase().includes(query.toLowerCase())
                                   ) || match.text;
                                   
-                                  sessionStorage.setItem('searchScrollTarget', JSON.stringify({
-                                    query: query,
+                                  const params = new URLSearchParams({
+                                    q: query,
                                     text: matchingLine.trim(),
-                                    lineNumber: match.lineNumber,
-                                    fullContext: match.context, // Include full context to find exact match
-                                    matchIndex: matchIdx, // Which match this is in the list
-                                    beforeContext: lines[0], // Line before for additional context
-                                    afterContext: lines[lines.length - 1] // Line after for additional context
-                                  }));
+                                    line: match.lineNumber.toString(),
+                                    context: match.context,
+                                    idx: matchIdx.toString(),
+                                    before: lines[0] || '',
+                                    after: lines[lines.length - 1] || ''
+                                  });
+                                  
+                                  return `/blog/${result.slug}?${params.toString()}`;
+                                })()}
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   onClose();
                                 }}
                                 className="block p-2 rounded hover:bg-white/5 group"

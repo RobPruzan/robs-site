@@ -11,16 +11,17 @@ export function SearchScrollHandler() {
     // Only run on client
     if (typeof window === 'undefined') return;
     
-    // Check for search scroll target in sessionStorage
-    const scrollTargetStr = sessionStorage.getItem('searchScrollTarget');
+    // Read search params using raw JS to avoid SSR issues
+    const urlParams = new URLSearchParams(window.location.search);
+    const query = urlParams.get('q');
+    const text = urlParams.get('text');
+    const lineNumber = urlParams.get('line');
+    const fullContext = urlParams.get('context');
+    const beforeContext = urlParams.get('before');
+    const afterContext = urlParams.get('after');
     
-    if (scrollTargetStr) {
+    if (query && text) {
       try {
-        const scrollTarget = JSON.parse(scrollTargetStr);
-        const { query, text, lineNumber, fullContext, beforeContext, afterContext } = scrollTarget;
-        
-        // Clear the storage so we don't scroll again on refresh
-        sessionStorage.removeItem('searchScrollTarget');
         
         // Disable Next.js scroll restoration temporarily
         if ('scrollRestoration' in window.history) {
@@ -141,6 +142,11 @@ export function SearchScrollHandler() {
               if ('scrollRestoration' in window.history) {
                 window.history.scrollRestoration = 'auto';
               }
+              
+              // Clean up URL params after scrolling to keep URL clean
+              // But preserve the path
+              const cleanUrl = window.location.pathname;
+              window.history.replaceState({}, '', cleanUrl);
             }, 50);
           });
         });
