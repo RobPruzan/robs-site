@@ -1,5 +1,5 @@
 import type { MDXComponents } from "mdx/types";
-import { PrismEditor } from "@/lib/PrismEditor";
+import { MDXCodeBlock } from "@/components/mdx-code-block";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
@@ -13,27 +13,8 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       const language = className.replace(/language-/, '');
       const code = codeElement.children || '';
       
-      // Map common languages to supported ones
-      const languageMap: Record<string, "tsx" | "python"> = {
-        typescript: "tsx",
-        ts: "tsx", 
-        javascript: "tsx",
-        js: "tsx",
-        jsx: "tsx",
-        tsx: "tsx",
-        swift: "tsx", // Use tsx highlighting for Swift
-        python: "python",
-        py: "python",
-      };
-      
-      const mappedLanguage = languageMap[language] || "tsx";
-      
-      // Use PrismEditor for syntax highlighting
-      return (
-        <div className="my-4 rounded-lg overflow-hidden border border-white/[0.08]">
-          <PrismEditor code={code} language={mappedLanguage} />
-        </div>
-      );
+      // Use the client component
+      return <MDXCodeBlock code={code} language={language} />;
     },
     code: ({ children, ...props }: any) => {
       // Inline code styling
