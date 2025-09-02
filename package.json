@@ -3,15 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "xtra dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "build:skip-types": "SKIP_TYPE_CHECK=true next build --no-lint",
+    "dev:original": "next dev"
   },
   "dependencies": {
-    "@mdx-js/loader": "^3.0.1",
-    "@mdx-js/react": "^3.0.1",
-    "@next/mdx": "^14.2.3",
+    "@mdx-js/loader": "^3",
+    "@mdx-js/react": "^3",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
@@ -28,8 +30,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.4.3",
-    "lucide-react": "^0.376.0",
-    "next": "14.2.4",
+    "next": "^15.5.2",
     "next-themes": "^0.3.0",
     "prismjs": "^1.29.0",
     "react": "18.3.1",
@@ -42,11 +43,24 @@
     "vaul": "^1.1.2"
   },
   "devDependencies": {
+    "@monaco-editor/react": "^4.7.0",
+    "@next/mdx": "^15.5.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@xterm/addon-fit": "^0.10.0",
+    "@xterm/xterm": "^5.5.0",
+    "bippy": "^0.3.21",
+    "glob": "^11.0.3",
+    "jest": "^30.0.5",
+    "lucide-react": "^0.376.0",
+    "modern-screenshot": "^4.6.6",
+    "monaco-editor": "^0.52.2",
     "postcss": "^8",
+    "react-resizable-panels": "^3.0.5",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "tldraw": "^3.15.3",
+    "typescript": "^5",
+    "zone.js": "^0.15.1"
   }
 }

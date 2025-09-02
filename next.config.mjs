@@ -1,18 +1,22 @@
-const withMDX = require("@next/mdx")({
+import createMDX from "@next/mdx";
+
+const withMDX = createMDX({
   extension: /\.mdx?$/,
   options: {
-    remarkPlugins: [
-      require("remark-slug"),
-      require("remark-autolink-headings"),
-    ],
+    remarkPlugins: [],
+    rehypePlugins: [],
   },
 });
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Configure `pageExtensions` to include MDX files
-  pageExtensions: ["js", "jsx", "mdx", "ts", "tsx"],
-  // Optionally, add any other Next.js config below
+  pageExtensions: ["js", "jsx", "ts", "tsx", "md", "mdx"],
+  distDir: ".next-prod",
+  experimental: {
+    browserDebugInfoInTerminal: true,
+    // mdxRs: false,
+  },
+  typescript: { ignoreBuildErrors: process.env.SKIP_TYPE_CHECK === "true" },
 };
 
-module.exports = withMDX(nextConfig);
+export default withMDX(nextConfig);

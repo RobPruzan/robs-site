@@ -11,6 +11,7 @@
 
 # next.js
 /.next/
+/.next-prod/
 /out/
 
 # production
@@ -34,3 +35,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# xtra testing framework runtime files
+# Keep .xtra/app/ and .xtra/dynamic/ in git (required for imports)
+/.xtra/results/
+/.xtra/logs/
+/.xtra/network/
+/.xtra/replay/
+/.xtra/ack/
+/.xtra/screenshots/
+/.xtra/ports.json

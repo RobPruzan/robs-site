@@ -29,19 +29,17 @@
     "target": "ES2017"
   },
   "include": [
-    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
+    "app/blog/(articles)/proximity-chat/page.mdx",
+    "app/blog/(articles)/session-replay-to-mp4/page.mdx",
     "app/test.mdx",
-    "app/blog/(articles)/proximity-chat/page.mdx"
-, "app/blog/(articles)/session-replay-to-mp4/page.mdx"  ],
+    "next-env.d.ts",
+    ".next-prod/types/**/*.ts"
+  ],
   "exclude": [
     "node_modules",
-
-
-      "**/snippet/**"
-
-  
+    "**/snippet/**"
   ]
 }

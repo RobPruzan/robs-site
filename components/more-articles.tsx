@@ -1,7 +1,12 @@
 "use client";
 
 import { getDirectories } from "@/lib/getDirectories";
-import { showArticles, createdAtMap, articleNameMap, descriptionMap } from "@/lib/utils";
+import {
+  showArticles,
+  createdAtMap,
+  articleNameMap,
+  descriptionMap,
+} from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -23,16 +28,19 @@ export const MoreArticles = ({
           return bDate.getTime() - aDate.getTime();
         })
         .map((name) => (
-          <div className="flex items-center gap-x-1 w-full justify-between">
+          <div
+            key={name}
+            className="flex items-center gap-x-1 w-full justify-between"
+          >
             <div className="flex gap-x-4">
               -
               <Link
                 className="underline underline-offset-4"
                 href={`/blog/${name}`}
               >
-                {
-                 name.includes("devlog")  ? descriptionMap[name] :
-                  articleNameMap[name as keyof typeof articleNameMap] ?? name}
+                {name.includes("devlog")
+                  ? descriptionMap[name]
+                  : articleNameMap[name as keyof typeof articleNameMap] ?? name}
               </Link>
             </div>
             <span>{createdAtMap[name].toLocaleDateString()}</span>

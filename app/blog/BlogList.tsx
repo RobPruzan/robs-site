@@ -15,7 +15,7 @@ interface BlogListProps {
 
 export function BlogList({ articles }: BlogListProps) {
   return (
-    <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-8">
+    <div className="max-w-[1400px] mx-auto px-4 md:px-6 pt-2 pb-4">
       <div className="space-y-12">
         {articles.map((article) => (
           <Link
