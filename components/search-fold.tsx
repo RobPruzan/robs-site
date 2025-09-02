@@ -184,7 +184,24 @@ export function SearchFold({ isOpen, onClose }: { isOpen: boolean; onClose: () =
               >
                 <Link
                   href={`/blog/${result.slug}`}
-                  onClick={onClose}
+                  onClick={() => {
+                    // Store the search context for scrolling
+                    if (result.matches.length > 0) {
+                      const firstMatch = result.matches[0];
+                      // Extract the actual matching line from context
+                      const lines = firstMatch.context.split('\n');
+                      const matchingLine = lines.find(line => 
+                        line.toLowerCase().includes(query.toLowerCase())
+                      ) || firstMatch.text;
+                      
+                      sessionStorage.setItem('searchScrollTarget', JSON.stringify({
+                        query: query,
+                        text: matchingLine.trim(),
+                        lineNumber: firstMatch.lineNumber
+                      }));
+                    }
+                    onClose();
+                  }}
                   className="block py-3 hover:bg-white/[0.02] group"
                 >
                   <div className="flex items-baseline gap-3">

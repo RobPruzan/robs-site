@@ -25,6 +25,7 @@ of characters, or a `number` is the infinite set of all possible numeric values.
   src="/typescript-article/numbers-and-strings.png"
   height="600"
   width="600"
+  alt="Diagram showing number and string types as infinite sets"
 />
 
 Once you start thinking about the type system as a proper functional programming language
@@ -49,6 +50,7 @@ We are intersecting Bar and Baz. Your first though might be the intersection ope
   src="/typescript-article/wrong-intersection.png"
   height="400"
   width="400"
+  alt="Incorrect visualization of TypeScript intersection operation"
 />
 
 Where we identify the overlap between the 2 objects, and take that as a result. But... there is no overlap? The left hand side (LHS) solely has x,
@@ -60,7 +62,7 @@ An easier way to think about what is happening is to resolve the types `Bar` and
 
 When we define a type of `{ y: number }`, we can construct an infinite set of object literals that at least have the property y in them, where y is a number:
 
-<Image src="/typescript-article/correct-set.png" height="400" width="400" />
+<Image src="/typescript-article/correct-set.png" height="400" width="400" alt="Correct visualization of TypeScript intersection as set intersection" />
 
 > **Note:** Notice how I said "set of object types that at least have the property y in them". That's why properties other than y
 > exist in some object types. If you had a variable that had type `{y: number}`, it wouldn't matter to you if the object had more properties
@@ -72,6 +74,7 @@ Now that we know how to replace types with the sets they construct, intersection
   src="/typescript-article/correct-intersection.png"
   height="600"
   width="600"
+  alt="TypeScript intersection operation showing overlapping sets"
 />
 #### Unions
 
@@ -79,7 +82,7 @@ Using the previous mental model we established, this is trivial, we just take th
 
 <SuspenseEditor filePath="./app/blog/(articles)/a-different-way-to-think-about-typescript/snippets/union-foo.ts" />
 
-<Image src="/typescript-article/correct-union.png" height="600" width="600" />
+<Image src="/typescript-article/correct-union.png" height="600" width="600" alt="TypeScript union operation combining two sets" />
 #### Type Introspection
 
 Because the TypeScript maintainers thought it would be convenient, they built primitives into the language to let us introspect these sets.
@@ -133,12 +136,12 @@ Our goal is to do this in TypeScript types. If we think of:
 
 as the set of all permutations of arrays containing numbers:
 
-<Image src="/typescript-article/array-set.png" height="300" width="300" />
+<Image src="/typescript-article/array-set.png" height="300" width="300" alt="Array type represented as a set of arrays" />
 
 We want to apply some transformation to select the numbers out of each item and place
 them in the set.
 
-<Image src="/typescript-article/array-flat.png" height="300" width="300" />
+<Image src="/typescript-article/array-flat.png" height="300" width="300" alt="Flattened array type visualization" />
 
 Instead of using imperative syntax, we can do this declaratively in typescript. For example:
 
@@ -156,7 +159,7 @@ This statement does the following:
 
 Visually we can describe this process as:
 
-<Image src="/typescript-article/infer-diagram.png" height="800" width="800" />
+<Image src="/typescript-article/infer-diagram.png" height="800" width="800" alt="TypeScript infer keyword diagram showing type extraction" />
 
 With this mental model, TypeScript using the word `infer` actually makes sense. It's automatically finding a type that would describe how to create
 the set we made- R`.
@@ -177,7 +180,7 @@ For example:
 
 <SuspenseEditor filePath="./app/blog/(articles)/a-different-way-to-think-about-typescript/snippets/bools-and-numbers.ts" />
 
-<Image src="/typescript-article/mapped-types.png" height="400" width="400" />
+<Image src="/typescript-article/mapped-types.png" height="400" width="400" alt="TypeScript mapped types transformation diagram" />
 
 The last step would be done in our minds- mapping the object type back to a set
 

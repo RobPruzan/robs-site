@@ -1,6 +1,7 @@
 import { MoreArticles } from "@/components/more-articles";
 import { MoreArticlesWithURLPath } from "./last-url-path";
 import { BackButton } from "./BackButton";
+import { SearchScrollHandler } from "@/components/search-scroll-handler";
 
 export default function ArticleLayout({
   children,
@@ -9,11 +10,12 @@ export default function ArticleLayout({
 }) {
   return (
     <div className="min-h-screen w-full">
+      <SearchScrollHandler />
       <div className="max-w-[1400px] mx-auto px-4 md:px-6 pt-8 pb-4 relative">
         <BackButton />
 
         <article
-          className="mx-auto prose prose-invert 
+          className="mx-auto prose prose-invert pt-12 md:pt-0 
           prose-p:text-white/80 prose-p:font-mono prose-p:leading-relaxed
           prose-headings:font-mono prose-headings:text-white/90
           prose-code:text-white/90 prose-code:bg-white/5 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
