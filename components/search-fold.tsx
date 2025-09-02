@@ -101,10 +101,16 @@ export function SearchFold({ isOpen, onClose }: { isOpen: boolean; onClose: () =
     performSearch(query);
   }, [query, performSearch]);
 
-  // Focus input when opened
+  // Focus input when opened (but not on mobile to prevent zoom)
   useEffect(() => {
     if (isOpen && inputRef.current) {
-      inputRef.current.focus();
+      // Check if mobile device
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || 
+                       window.innerWidth < 768;
+      
+      if (!isMobile) {
+        inputRef.current.focus();
+      }
     } else if (!isOpen) {
       // Clear everything when closed
       setQuery("");
@@ -155,9 +161,10 @@ export function SearchFold({ isOpen, onClose }: { isOpen: boolean; onClose: () =
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search articles..."
-              className="flex-1 bg-transparent text-white text-sm font-mono outline-none placeholder:text-white/30"
+              className="flex-1 bg-transparent text-white text-base md:text-sm font-mono outline-none placeholder:text-white/30"
               autoComplete="off"
               spellCheck={false}
+              style={{ fontSize: '16px' }} // Prevents zoom on iOS when font-size < 16px
             />
             <button
               onClick={onClose}
