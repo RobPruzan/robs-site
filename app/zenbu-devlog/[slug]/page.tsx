@@ -12,10 +12,11 @@ export async function generateStaticParams() {
     }));
 }
 
-export default function ZenbuDevlogArticlePage({
+export default async function ZenbuDevlogArticlePage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  redirect(`/blog/${params.slug}`);
+  const { slug } = await params;
+  redirect(`/blog/${slug}`);
 }
